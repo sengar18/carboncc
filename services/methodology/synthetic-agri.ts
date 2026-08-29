@@ -1,0 +1,136 @@
+// ==============================================================================
+// CARBONSCOUT INDIA — SYNTHETIC TEST METHODOLOGY (SYNTH-AGRI-001)
+// ==============================================================================
+// CRITICAL NON-FABRICATION RULE:
+// This is a SYNTHETIC_TEST_METHODOLOGY used strictly for automated unit testing and
+// software architecture validation. It is NOT an Indian BEE/CCTS certified
+// standard and MUST NEVER be represented as authoritative production regulation.
+
+import { MethodologyVersion } from './types';
+
+export const SYNTH_AGRI_001: MethodologyVersion = {
+  code: 'SYNTH-AGRI-001',
+  name: 'Synthetic Agricultural Residue Biomass Assessment (TEST ONLY)',
+  type: 'SYNTHETIC_TEST_METHODOLOGY',
+  version: '1.0-SYNTH',
+  publicationDate: '2026-08-01',
+  effectiveDate: '2026-08-01',
+  issuingAuthority: 'Synthetic Test Framework (Internal)',
+  sector: 'Rice / Food Processing',
+  sectoralScopeCode: '04: Agriculture',
+  referenceUnfcccCdm: ['SYNTH-CDM-001'],
+  pageCount: 10,
+  sourceUrl: 'https://carbonscout.internal/methodologies/SYNTH-AGRI-001',
+  sourceDocument: 'SYNTH_AGRI_001_TEST_SPEC.pdf',
+  documentHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+  retrievalDate: '2026-08-01',
+  isActive: true,
+  isSynthetic: true,
+  verificationStatus: 'UNVERIFIED',
+  adoptedTools: [],
+  externalDependencies: [],
+  calculationFormulas: [],
+  description:
+
+    'Synthetic test methodology designed to simulate eligibility screening, feedstock quantification, and grid displacement logic for agricultural biomass energy in India.',
+  applicabilityConditions: [
+    {
+      id: 'COND-SECTOR',
+      field: 'SECTOR',
+      label: 'Facility Sector Alignment',
+      operator: 'CONTAINS',
+      expectedValue: 'Rice / Food Processing, Agriculture, Agricultural Waste',
+      isMandatory: true,
+      pageReference: 1,
+      sectionReference: '1. Applicability',
+      provenanceQuote: 'Synthetic clause for agricultural facility processing residue alignment.',
+      failureMessage: 'Facility sector must be in agro-processing, food milling, or agricultural waste.',
+    },
+    {
+      id: 'COND-BIOMASS-MIN',
+      field: 'ANNUAL_BIOMASS_RESIDUE_MT',
+      label: 'Minimum Annual Biomass Feedstock',
+      operator: 'GREATER_THAN',
+      expectedValue: 1000,
+      unit: 'MT/year',
+      isMandatory: true,
+      pageReference: 2,
+      sectionReference: '2. Feedstock Threshold',
+      provenanceQuote: 'Synthetic clause requiring minimum 1,000 MT/year of surplus biomass.',
+      failureMessage: 'Requires at least 1,000 MT/year of available surplus agro-residue feedstock.',
+    },
+    {
+      id: 'COND-GRID-BASELINE',
+      field: 'GRID_CONNECTED',
+      label: 'Grid Connection or Fossil Displacement',
+      operator: 'BOOLEAN',
+      expectedValue: true,
+      isMandatory: true,
+      pageReference: 3,
+      sectionReference: '3. Baseline Grid Connection',
+      provenanceQuote: 'Synthetic clause requiring connection to regional electric grid.',
+      failureMessage: 'Facility must displace regional grid electricity or fossil fuel thermal generation.',
+    },
+    {
+      id: 'COND-NO-PRIOR-CREDITS',
+      field: 'EXISTING_CARBON_CREDITS',
+      label: 'Zero Prior Carbon Credit Registration',
+      operator: 'BOOLEAN',
+      expectedValue: false,
+      isMandatory: true,
+      pageReference: 4,
+      sectionReference: '4. Non-Double Counting',
+      provenanceQuote: 'Synthetic clause prohibiting pre-existing active carbon registrations.',
+      failureMessage: 'Facility must not have active registered carbon credit projects (prevents double counting).',
+    },
+  ],
+  monitoringRequirements: [
+    {
+      id: 'MON-001',
+      parameter: 'Weight of agro-biomass combusted or processed',
+      frequency: 'BATCH_WEIGHBRIDGE',
+      equipment: 'Calibrated industrial weighbridge with digital printouts',
+      standard: 'Legal Metrology compliant weighbridge logs',
+      pageReference: 5,
+      sectionReference: '5. Monitoring',
+    },
+    {
+      id: 'MON-002',
+      parameter: 'Net electricity generated or displaced',
+      frequency: 'CONTINUOUS',
+      equipment: 'Class 0.2S tri-vector energy meters',
+      standard: 'CEA / State Electricity Grid code standard',
+      pageReference: 6,
+      sectionReference: '5. Monitoring',
+    },
+  ],
+  evidenceRequirements: [
+    {
+      id: 'EVID-001',
+      documentType: 'ELECTRICITY_BILL',
+      description: '12 consecutive months of DISCOM electricity bills showing connected load and consumption',
+      isMandatory: true,
+      pageReference: 7,
+      sectionReference: '6. Evidence Checklist',
+      provenanceQuote: 'Synthetic document requirement: DISCOM bills.',
+    },
+    {
+      id: 'EVID-002',
+      documentType: 'PRODUCTION_LOG',
+      description: 'Annual agro-feedstock processing records or weighbridge summary registers',
+      isMandatory: true,
+      pageReference: 8,
+      sectionReference: '6. Evidence Checklist',
+      provenanceQuote: 'Synthetic document requirement: Weighbridge records.',
+    },
+    {
+      id: 'EVID-003',
+      documentType: 'ENVIRONMENTAL_CLEARANCE',
+      description: 'State Pollution Control Board (SPCB) Consent to Operate (CTO)',
+      isMandatory: false,
+      pageReference: 9,
+      sectionReference: '6. Evidence Checklist',
+      provenanceQuote: 'Synthetic document requirement: SPCB CTO.',
+    },
+  ],
+};
