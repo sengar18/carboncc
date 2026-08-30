@@ -191,7 +191,7 @@ describe('Official CCTS Methodology Ingestion & Evidence Gate', () => {
       ];
 
       const match = matcher.matchBestMethodology(facts, 'Renewable Energy');
-      expect(match).not.toBeNull();
+      expect(match).not.toBeUndefined();
       expect(match?.methodologyCode).toBe('BM EN01.001');
       expect(match?.status).toBe('MATCH');
       expect(match?.matchedCount).toBeGreaterThanOrEqual(3);
@@ -234,7 +234,7 @@ describe('Official CCTS Methodology Ingestion & Evidence Gate', () => {
 
 
       const match = matcher.matchBestMethodology(facts, 'Waste Handling and Disposal');
-      expect(match).not.toBeNull();
+      expect(match).not.toBeUndefined();
       expect(match?.methodologyCode).toBe('BM WA03.003');
       expect(match?.matchedCount).toBeGreaterThanOrEqual(1);
     });
@@ -285,7 +285,7 @@ describe('Official CCTS Methodology Ingestion & Evidence Gate', () => {
       ]);
 
       expect(result.status).toBe('INSUFFICIENT_DATA');
-      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeNull();
+      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeUndefined();
       expect(result.assumptions.some((a) => a.includes('Missing mandatory input parameter'))).toBe(true);
     });
 
@@ -295,7 +295,7 @@ describe('Official CCTS Methodology Ingestion & Evidence Gate', () => {
       ]);
 
       expect(result.status).toBe('CALCULATION_UNAVAILABLE');
-      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeNull();
+      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeUndefined();
       expect(result.explanation).toContain('Parameterization pending project specific carbon pool inventory data');
     });
   });
