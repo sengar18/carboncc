@@ -90,7 +90,7 @@ export async function POST(
           existingFact.confidence = 1.0;
           existingFact.updated_at = new Date().toISOString();
         } else {
-          const factId = `fact-ans-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+          const factId = `fact-ans-${crypto.randomUUID()}`;
           memoryStore.facts.set(factId, {
             id: factId,
             project_id: project.id,

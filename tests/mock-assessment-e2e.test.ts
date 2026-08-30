@@ -50,7 +50,7 @@ describe('End-to-End Mock Assessment Loop', () => {
 
     // Save facts into store
     for (const ef of research.extractedFacts) {
-      const factId = `fact-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+      const factId = `fact-${crypto.randomUUID()}`;
       memoryStore.facts.set(factId, {
         id: factId,
         project_id: projectId,
