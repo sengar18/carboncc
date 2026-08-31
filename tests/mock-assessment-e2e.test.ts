@@ -43,14 +43,14 @@ describe('End-to-End Mock Assessment Loop', () => {
     });
 
     // Step 3: Run Research
-    const researchProvider = getResearchProvider('mock');
+const researchProvider = getResearchProvider('mock');
     const research = await researchProvider.researchCompany('Doaba Agro', undefined, 'Punjab');
     expect(research.sources.length).toBeGreaterThan(0);
     expect(research.extractedFacts.length).toBeGreaterThan(0);
 
     // Save facts into store
     for (const ef of research.extractedFacts) {
-      const factId = `fact-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+const factId = `fact-${Date.now()}-${crypto.randomUUID()}`;
       memoryStore.facts.set(factId, {
         id: factId,
         project_id: projectId,
@@ -73,7 +73,7 @@ describe('End-to-End Mock Assessment Loop', () => {
     expect(initialFacts.length).toBe(research.extractedFacts.length);
 
     // Step 5 & 6: Identify Data Gaps
-    const aiProvider = getAIProvider('mock');
+const aiProvider = getAIProvider('mock');
     const dataGaps = await aiProvider.identifyDataGaps(initialFacts, 'Biomass Energy / Cogeneration');
     expect(dataGaps.length).toBeGreaterThan(0);
 

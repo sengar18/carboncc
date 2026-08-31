@@ -1,4 +1,6 @@
 // ==============================================================================
+// CARBONSCOUT INDIA — IN-MEMORY DATABASE STORE
+// ==============================================================================
 // CARBONSCOUT INDIA — IN-MEMORY DATABASE STORE (OFFICIAL CCTS KNOWLEDGE BASE)
 // ==============================================================================
 
@@ -261,7 +263,7 @@ export class MemoryStore {
   public addAuditLog(log: Omit<AuditLog, 'id' | 'created_at'>): AuditLog {
     const newLog: AuditLog = {
       ...log,
-      id: `audit-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: `audit-${Date.now()}-${crypto.randomUUID()}`,
       created_at: new Date().toISOString(),
     };
     this.auditLogs.push(newLog);

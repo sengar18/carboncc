@@ -1,4 +1,6 @@
 // ==============================================================================
+// CARBONSCOUT INDIA — ADMIN PROJECT DETAIL VIEW
+// ==============================================================================
 // CARBONSCOUT INDIA — PROJECT DETAIL DEEP DIVE & AUDIT PAGE
 // ==============================================================================
 
@@ -73,8 +75,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       } else {
         setUploadStatus(`Upload Error: ${data.error}`);
       }
-    } catch (err: any) {
-      setUploadStatus(`Error: ${err.message}`);
+    } catch (err) {
+      setUploadStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 

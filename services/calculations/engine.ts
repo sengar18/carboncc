@@ -1,6 +1,8 @@
 // ==============================================================================
 // CARBONSCOUT INDIA — DETERMINISTIC CALCULATION ENGINE
 // ==============================================================================
+// CARBONSCOUT INDIA — DETERMINISTIC CALCULATION ENGINE
+// ==============================================================================
 
 import { CalculationInputParam, CalculationResult, CalculationProvenanceCitation } from './types';
 import { UnitConverter } from './unit-converter';
