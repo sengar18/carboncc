@@ -91,7 +91,6 @@ export async function POST(
           existingFact.updated_at = new Date().toISOString();
         } else {
           const factId = `fact-ans-${Date.now()}-${crypto.randomUUID().split('-')[0]}`;
-          const factId = `fact-ans-${Date.now()}-${crypto.randomUUID()}`;
           memoryStore.facts.set(factId, {
             id: factId,
             project_id: project.id,
@@ -139,7 +138,7 @@ export async function POST(
         missingInputs: ['Applicable CCTS methodology match required before running calculations'],
         originalInputs: {},
         normalizedInputs: {},
-        outputs: {},
+        outputs: { estimatedAnnualAbatement_tCO2e: null as any },
         assumptions: ['No verified official methodology matched the provided project facts.'],
         explanation: 'Calculation skipped: No applicable CCTS methodology matched the project scope and facts.',
         executedAt: new Date().toISOString(),

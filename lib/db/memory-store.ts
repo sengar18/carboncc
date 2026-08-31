@@ -262,7 +262,6 @@ export class MemoryStore {
     const newLog: AuditLog = {
       ...log,
       id: `audit-${Date.now()}-${crypto.randomUUID().split('-')[0]}`,
-      id: `audit-${Date.now()}-${crypto.randomUUID()}`,
       created_at: new Date().toISOString(),
     };
     this.auditLogs.push(newLog);

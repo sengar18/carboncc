@@ -285,7 +285,7 @@ describe('Official CCTS Methodology Ingestion & Evidence Gate', () => {
       ]);
 
       expect(result.status).toBe('INSUFFICIENT_DATA');
-      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeUndefined();
+      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeNull();
       expect(result.assumptions.some((a) => a.includes('Missing mandatory input parameter'))).toBe(true);
     });
 
@@ -295,7 +295,7 @@ describe('Official CCTS Methodology Ingestion & Evidence Gate', () => {
       ]);
 
       expect(result.status).toBe('CALCULATION_UNAVAILABLE');
-      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeUndefined();
+      expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeNull();
       expect(result.explanation).toContain('Parameterization pending project specific carbon pool inventory data');
     });
   });
