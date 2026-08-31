@@ -243,8 +243,8 @@ export async function POST(
       report,
       matchSummary,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Execute assessment error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to execute assessment' }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Failed to execute assessment' }, { status: 500 });
   }
 }
