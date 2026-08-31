@@ -1,12 +1,10 @@
 // ==============================================================================
-// CARBONSCOUT INDIA — RESEARCH API ROUTE
-// ==============================================================================
 // CARBONSCOUT INDIA — COMPANY & PROJECT RESEARCH API
 // ==============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getResearchProvider } from '@/services/research';
-import { memoryStore } from '@/lib/db/memory-store';
+import { db } from '@/lib/db';
 import { logAuditEvent } from '@/lib/audit';
 import { Fact, ResearchSource } from '@/lib/db/schema';
 
@@ -25,9 +23,10 @@ export async function POST(req: NextRequest) {
     const currentProjectId = projectId || `proj-${Date.now()}`;
     const currentOrgId = orgId || `org-${Date.now()}`;
 
-    // Ensure Organization exists in memory store
-    if (!memoryStore.getOrganizationById(currentOrgId)) {
-      memoryStore.organizations.set(currentOrgId, {
+    // Ensure Organization exists in DB
+    const existingOrg = await db.getOrganizationById(currentOrgId);
+    if (!existingOrg) {
+      await db.createOrganization({
         id: currentOrgId,
         name: companyName,
         industry_sector: sector || 'Rice / Food Processing',
@@ -38,9 +37,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Ensure Project exists in memory store
-    if (!memoryStore.getProjectById(currentProjectId)) {
-      memoryStore.projects.set(currentProjectId, {
+    // Ensure Project exists in DB
+    const existingProj = await db.getProjectById(currentProjectId);
+    if (!existingProj) {
+      await db.createProject({
         id: currentProjectId,
         organization_id: currentOrgId,
         title: `${companyName} Clean Energy & Bio-Residue Project`,
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         retrieved_at: src.retrievedAt,
         created_at: new Date().toISOString(),
       };
-      memoryStore.researchSources.set(sourceId, sourceRecord);
+      await db.createSource(sourceRecord);
       createdSources.push(sourceRecord);
     }
 
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      memoryStore.facts.set(factId, factRecord);
+      await db.createFact(factRecord);
       createdFacts.push(factRecord);
     }
 

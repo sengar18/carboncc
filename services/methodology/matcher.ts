@@ -114,22 +114,29 @@ export class MethodologyMatcher {
       };
     }
 
-    // 2. Find relevant facts (case-insensitive and alias-aware)
+    // 2. Find relevant facts (exact match first, then targeted aliases)
     let matchingFacts: Fact[] = [];
     const normalizedCondField = cond.field.toLowerCase().replace(/_/g, '');
 
     for (const [factType, factsList] of factsMap.entries()) {
       const normalizedFactType = factType.toLowerCase().replace(/_/g, '');
-      if (
-        normalizedFactType === normalizedCondField ||
-        normalizedFactType.includes(normalizedCondField) ||
-        normalizedCondField.includes(normalizedFactType) ||
-        (cond.field.toLowerCase().includes('biomass') && (normalizedFactType.includes('biomass') || normalizedFactType.includes('husk') || normalizedFactType.includes('feedstock'))) ||
-        (cond.field.toLowerCase().includes('grid') && normalizedFactType.includes('grid')) ||
-        (cond.field.toLowerCase().includes('carbon') && (normalizedFactType.includes('carbon') || normalizedFactType.includes('project'))) ||
-        (cond.field.toLowerCase().includes('cbg') && (normalizedFactType.includes('cbg') || normalizedFactType.includes('biogas')))
-      ) {
+      if (normalizedFactType === normalizedCondField) {
         matchingFacts.push(...factsList);
+      }
+    }
+
+    // Targeted alias resolution if no exact match
+    if (matchingFacts.length === 0) {
+      for (const [factType, factsList] of factsMap.entries()) {
+        const normalizedFactType = factType.toLowerCase().replace(/_/g, '');
+        if (
+          (normalizedCondField === 'biomassfeedstockallowed' && (normalizedFactType.includes('feedstock') || normalizedFactType.includes('biomass'))) ||
+          (normalizedCondField === 'gridconnected' && (normalizedFactType.includes('grid') || normalizedFactType.includes('electricity'))) ||
+          (normalizedCondField === 'existingcarboncredits' && (normalizedFactType.includes('carbon') || normalizedFactType.includes('project'))) ||
+          (normalizedCondField === 'annualbiomassresiduemt' && (normalizedFactType.includes('biomass') && (normalizedFactType.includes('mt') || normalizedFactType.includes('quantity'))))
+        ) {
+          matchingFacts.push(...factsList);
+        }
       }
     }
 
@@ -297,7 +304,6 @@ export class MethodologyMatcher {
       if (matchCountDiff !== 0) return matchCountDiff;
       return b.confidenceScore - a.confidenceScore;
     });
-
 
     return evaluations[0] || null;
   }

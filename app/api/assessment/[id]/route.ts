@@ -1,14 +1,13 @@
 // ==============================================================================
-// CARBONSCOUT INDIA — ASSESSMENT BY ID API ROUTE
-// ==============================================================================
 // CARBONSCOUT INDIA — ASSESSMENT DETAIL, EXECUTION & REPORT API
 // ==============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { memoryStore } from '@/lib/db/memory-store';
+import { db } from '@/lib/db';
 import { methodologyMatcher } from '@/services/methodology/matcher';
 import { calculationEngine, CalculationResult } from '@/services/calculations/engine';
 import { opportunityScoreEngine } from '@/services/scoring/engine';
+import { EnvironmentalPathwayScreener } from '@/services/methodology/pathway-screener';
 import { getAIProvider } from '@/services/ai';
 import { logAuditEvent } from '@/lib/audit';
 import { CalculationRun, Fact } from '@/lib/db/schema';
@@ -18,19 +17,23 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const assessment = memoryStore.assessments.get(id);
+  const assessment = await db.getAssessmentById(id);
 
   if (!assessment) {
     return NextResponse.json({ error: 'Assessment not found' }, { status: 404 });
   }
 
-  const project = memoryStore.getProjectById(assessment.project_id);
-  const organization = project ? memoryStore.getOrganizationById(project.organization_id) : undefined;
-  const facts = memoryStore.getFactsByProjectId(assessment.project_id);
-  const sources = memoryStore.getSourcesByProjectId(assessment.project_id);
-  const questions = memoryStore.getQuestionsByAssessmentId(id);
-  const calculationRuns = memoryStore.getCalculationRunsByAssessmentId(id);
-  const documents = memoryStore.getDocumentsByProjectId(assessment.project_id);
+  const project = await db.getProjectById(assessment.project_id);
+  const organization = project ? await db.getOrganizationById(project.organization_id) : undefined;
+  const facts = await db.getFactsByProjectId(assessment.project_id);
+  const sources = await db.getSourcesByProjectId(assessment.project_id);
+  const questions = await db.getQuestionsByAssessmentId(id);
+  const calculationRuns = await db.getCalculationRunsByAssessmentId(id);
+  const documents = await db.getDocumentsByProjectId(assessment.project_id);
+
+  const pathwayScreening = project
+    ? EnvironmentalPathwayScreener.screenPathways(project.sector, project.location_state, facts)
+    : undefined;
 
   return NextResponse.json({
     assessment,
@@ -41,6 +44,7 @@ export async function GET(
     questions,
     calculationRuns,
     documents,
+    pathwayScreening,
   });
 }
 
@@ -53,47 +57,51 @@ export async function POST(
     const body = await req.json();
     const { answers } = body; // Map of question_key -> user_response
 
-    const assessment = memoryStore.assessments.get(id);
+    const assessment = await db.getAssessmentById(id);
     if (!assessment) {
       return NextResponse.json({ error: 'Assessment not found' }, { status: 404 });
     }
 
-    const project = memoryStore.getProjectById(assessment.project_id);
+    const project = await db.getProjectById(assessment.project_id);
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    const organization = memoryStore.getOrganizationById(project.organization_id);
+    const organization = await db.getOrganizationById(project.organization_id);
 
     // 1. Process and record question answers as USER_PROVIDED facts
     if (answers && typeof answers === 'object') {
-      const existingQuestions = memoryStore.getQuestionsByAssessmentId(id);
+      const existingQuestions = await db.getQuestionsByAssessmentId(id);
 
       for (const [key, responseValue] of Object.entries(answers)) {
         const valStr = String(responseValue);
         // Mark question answered
         const question = existingQuestions.find((q) => q.question_key === key);
         if (question) {
-          question.user_response = valStr;
-          question.is_answered = true;
-          question.answered_at = new Date().toISOString();
+          await db.updateQuestion(question.id, {
+            user_response: valStr,
+            is_answered: true,
+            answered_at: new Date().toISOString(),
+          });
         }
 
         // Create or update fact
-        const existingFact = Array.from(memoryStore.facts.values()).find(
-          (f) => f.project_id === project.id && f.fact_type === key
-        );
+        const existingFacts = await db.getFactsByProjectId(project.id);
+        const existingFact = existingFacts.find((f) => f.fact_type === key);
 
         const numVal = parseFloat(valStr.replace(/[^0-9.]/g, ''));
         if (existingFact) {
-          existingFact.value_raw = valStr;
-          if (!isNaN(numVal)) existingFact.value_numeric = numVal;
-          existingFact.status = 'USER_PROVIDED';
-          existingFact.confidence = 1.0;
-          existingFact.updated_at = new Date().toISOString();
+          await db.createFact({
+            ...existingFact,
+            value_raw: valStr,
+            value_numeric: isNaN(numVal) ? undefined : numVal,
+            status: 'USER_PROVIDED',
+            confidence: 1.0,
+            updated_at: new Date().toISOString(),
+          });
         } else {
           const factId = `fact-ans-${Date.now()}-${crypto.randomUUID()}`;
-          memoryStore.facts.set(factId, {
+          await db.createFact({
             id: factId,
             project_id: project.id,
             fact_type: key,
@@ -111,7 +119,7 @@ export async function POST(
     }
 
     // 2. Fetch updated facts
-    const facts = memoryStore.getFactsByProjectId(project.id);
+    const facts = await db.getFactsByProjectId(project.id);
 
     // 3. Run Methodology Matcher
     const matchSummary = methodologyMatcher.matchBestMethodology(facts, project.sector);
@@ -163,8 +171,7 @@ export async function POST(
       is_synthetic: calcResult.isSynthetic,
       executed_at: new Date().toISOString(),
     };
-    memoryStore.calculationRuns.set(runId, runRecord);
-
+    await db.createCalculationRun(runRecord);
 
     await logAuditEvent({
       entityType: 'CALCULATION_RUN',
@@ -178,7 +185,7 @@ export async function POST(
     });
 
     // 5. Calculate Deterministic Opportunity Score
-    const biomassFact = facts.find((f) => f.fact_type.includes('BIOMASS') || f.fact_type.includes('HUSK'));
+    const biomassFact = facts.find((f) => f.fact_type.includes('BIOMASS') || f.fact_type.includes('HUSK') || f.fact_type.includes('CAPACITY'));
     const gridFact = facts.find((f) => f.fact_type.includes('GRID'));
     const priorProjectFact = facts.find((f) => f.fact_type.includes('PREEXISTING') || f.fact_type.includes('CARBON_PROJECT'));
 
@@ -197,12 +204,12 @@ export async function POST(
       factsCount: facts.length,
       verifiedFactsCount: verifiedCount,
       hasElectricityBillsOrLogs: true,
-      commercialPotentialEvidence: 'Captive power generation offsets commercial retail grid tariff (~INR 7.50/kWh).',
+      commercialPotentialEvidence: 'Captive power / clean energy generation offsets commercial retail grid tariff (~INR 7.50/kWh).',
     });
 
     // 6. Generate Preliminary Report with AI layer
     const aiProvider = getAIProvider();
-    const aiMatchResult = await aiProvider.matchMethodology(facts, memoryStore.getMethodologies());
+    const aiMatchResult = await aiProvider.matchMethodology(facts, db.getMethodologies());
     const report = await aiProvider.generatePreliminaryReport({
       projectName: project.title,
       organizationName: organization?.name || 'Project Developer',
@@ -212,20 +219,31 @@ export async function POST(
       matchResult: aiMatchResult,
     });
 
-    // 7. Update Assessment Record
-    assessment.status = matchSummary?.status === 'MISMATCH' ? 'REJECTED' : 'COMPLETED';
-    assessment.opportunity_score = scoreResult.totalScore;
-    assessment.score_category = scoreResult.category;
-    assessment.score_breakdown = scoreResult.breakdown;
-    assessment.applicability_summary = matchSummary?.summary || report.applicabilityAssessment;
-    assessment.red_flags = Array.from(new Set([...(matchSummary?.redFlags || []), ...report.redFlags]));
-    assessment.uncertainty_notes = report.uncertaintyNotes;
-    assessment.next_steps = report.recommendedNextSteps;
-    assessment.updated_at = new Date().toISOString();
+    // 7. Environmental Pathway Screening (Phase 9)
+    const pathwayScreening = EnvironmentalPathwayScreener.screenPathways(
+      project.sector,
+      project.location_state,
+      facts
+    );
+
+    // 8. Update Assessment Record
+    const updatedAssessment = await db.updateAssessment(id, {
+      status: matchSummary?.status === 'MISMATCH' ? 'REJECTED' : 'COMPLETED',
+      opportunity_score: scoreResult.totalScore,
+      score_category: scoreResult.category,
+      score_breakdown: scoreResult.breakdown,
+      applicability_summary: matchSummary?.summary || report.applicabilityAssessment,
+      red_flags: Array.from(new Set([...(matchSummary?.redFlags || []), ...report.redFlags])),
+      uncertainty_notes: report.uncertaintyNotes,
+      next_steps: report.recommendedNextSteps,
+      updated_at: new Date().toISOString(),
+    });
 
     // Update Project Status
-    project.pipeline_status = scoreResult.totalScore >= 70 ? 'QUALIFIED' : 'ASSESSMENT';
-    project.updated_at = new Date().toISOString();
+    await db.updateProject(project.id, {
+      pipeline_status: scoreResult.totalScore >= 70 ? 'QUALIFIED' : 'ASSESSMENT',
+      updated_at: new Date().toISOString(),
+    });
 
     await logAuditEvent({
       entityType: 'ASSESSMENT',
@@ -239,11 +257,12 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      assessment,
+      assessment: updatedAssessment || assessment,
       calculationRun: runRecord,
       scoreResult,
       report,
       matchSummary,
+      pathwayScreening,
     });
   } catch (error) {
     console.error('Execute assessment error:', error);

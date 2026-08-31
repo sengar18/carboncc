@@ -2,7 +2,7 @@
 // CARBONSCOUT INDIA — SECURE AUDIT LOGGING SERVICE
 // ==============================================================================
 
-import { memoryStore } from './db/memory-store';
+import { db } from './db';
 import { AuditLog } from './db/schema';
 
 const SENSITIVE_KEYS = [
@@ -18,6 +18,7 @@ const SENSITIVE_KEYS = [
   'firecrawl_api_key',
   'gemini_api_key',
   'openai_api_key',
+  'groq_api_key',
 ];
 
 export function redactSensitiveData(data: any): any {
@@ -56,7 +57,7 @@ export async function logAuditEvent(params: {
 }): Promise<AuditLog> {
   const sanitizedDetails = params.details ? redactSensitiveData(params.details) : undefined;
 
-  const entry = memoryStore.addAuditLog({
+  const entry = await db.addAuditLog({
     entity_type: params.entityType,
     entity_id: params.entityId,
     action: params.action,

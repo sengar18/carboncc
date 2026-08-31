@@ -1,11 +1,9 @@
 // ==============================================================================
-// CARBONSCOUT INDIA — ASSESSMENT CREATION API ROUTE
-// ==============================================================================
 // CARBONSCOUT INDIA — ASSESSMENT INITIATION & LISTING API
 // ==============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { memoryStore } from '@/lib/db/memory-store';
+import { db } from '@/lib/db';
 import { getAIProvider } from '@/services/ai';
 import { methodologyMatcher } from '@/services/methodology/matcher';
 import { logAuditEvent } from '@/lib/audit';
@@ -16,11 +14,16 @@ export async function GET(req: NextRequest) {
   const projectId = searchParams.get('projectId');
 
   if (projectId) {
-    const assessments = memoryStore.getAssessmentsByProjectId(projectId);
+    const assessments = await db.getAssessmentsByProjectId(projectId);
     return NextResponse.json({ assessments });
   }
 
-  const allAssessments = Array.from(memoryStore.assessments.values());
+  const projects = await db.getProjects();
+  const allAssessments: Assessment[] = [];
+  for (const p of projects) {
+    const list = await db.getAssessmentsByProjectId(p.id);
+    allAssessments.push(...list);
+  }
   return NextResponse.json({ assessments: allAssessments });
 }
 
@@ -33,7 +36,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'projectId is required.' }, { status: 400 });
     }
 
-    const project = memoryStore.getProjectById(projectId);
+    const project = await db.getProjectById(projectId);
     if (!project) {
       return NextResponse.json({ error: 'Project not found.' }, { status: 404 });
     }
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
     if (userProvidedFacts && Array.isArray(userProvidedFacts)) {
       for (const uf of userProvidedFacts) {
         const factId = `fact-user-${Date.now()}-${crypto.randomUUID()}`;
-        memoryStore.facts.set(factId, {
+        await db.createFact({
           id: factId,
           project_id: projectId,
           fact_type: uf.factType,
@@ -59,7 +62,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const facts = memoryStore.getFactsByProjectId(projectId);
+    const facts = await db.getFactsByProjectId(projectId);
     const aiProvider = getAIProvider();
 
     // 1. Identify Data Gaps
@@ -96,7 +99,7 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    memoryStore.assessments.set(assessmentId, assessment);
+    await db.createAssessment(assessment);
 
     // 3. Save Questions
     const createdQuestions: Question[] = [];
@@ -114,7 +117,7 @@ export async function POST(req: NextRequest) {
         is_answered: false,
         created_at: new Date().toISOString(),
       };
-      memoryStore.questions.set(qId, qRecord);
+      await db.createQuestion(qRecord);
       createdQuestions.push(qRecord);
     }
 
