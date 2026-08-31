@@ -168,7 +168,14 @@ Return a single JSON object matching:
 }
 Only return valid JSON.`;
 
-    const userPrompt = `Project Facts:\n${JSON.stringify(facts, null, 2)}\n\nCandidate Methodologies:\n${JSON.stringify(candidateMethodologies, null, 2)}`;
+    const conciseCandidates = candidateMethodologies.map((m) => ({
+      code: m.code,
+      name: m.name,
+      sector: m.sector,
+      description: m.description,
+    }));
+
+    const userPrompt = `Project Facts:\n${JSON.stringify(facts, null, 2)}\n\nCandidate Methodologies:\n${JSON.stringify(conciseCandidates, null, 2)}`;
     const rawJson = await this.callGroq(systemPrompt, userPrompt, true);
 
     let parsed: any;
@@ -200,10 +207,20 @@ Return a single JSON object matching:
 {
   "executiveSummary": string,
   "projectDescription": string,
-  "methodologyEvaluation": string,
-  "additionalityAnalysis": string,
-  "riskAssessment": string[],
-  "nextActionItems": string[]
+  "evidenceReviewedSummary": string,
+  "candidateMethodology": {
+    "code": string,
+    "name": string,
+    "isSynthetic": boolean
+  },
+  "applicabilityAssessment": string,
+  "dataGaps": string[],
+  "redFlags": string[],
+  "opportunityScore": number (0-100),
+  "scoreCategory": "HIGH_PRELIMINARY_POTENTIAL" | "INVESTIGATE" | "WEAK_OR_UNCERTAIN" | "LOW_POTENTIAL",
+  "disclaimer": string,
+  "uncertaintyNotes": string,
+  "recommendedNextSteps": string[]
 }
 Only return valid JSON.`;
 
