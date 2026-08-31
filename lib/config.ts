@@ -17,6 +17,7 @@ export interface AppConfig {
   firecrawlApiKey?: string;
   maxUploadSizeBytes: number;
   allowedFileTypes: string[];
+  allowedMimeTypes: string[];
 }
 
 export const config: AppConfig = {
@@ -34,6 +35,10 @@ export const config: AppConfig = {
   firecrawlApiKey: process.env.FIRECRAWL_API_KEY,
   maxUploadSizeBytes: parseInt(process.env.MAX_UPLOAD_SIZE_BYTES || '15728640', 10), // 15MB
   allowedFileTypes: (
+    process.env.ALLOWED_FILE_TYPES ||
+    'application/pdf,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ).split(','),
+  allowedMimeTypes: (
     process.env.ALLOWED_FILE_TYPES ||
     'application/pdf,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   ).split(','),
