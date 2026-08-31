@@ -129,8 +129,11 @@ export async function POST(req: NextRequest) {
       assessment,
       questions: createdQuestions,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Create assessment error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to create assessment' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to create assessment' },
+      { status: 500 }
+    );
   }
 }

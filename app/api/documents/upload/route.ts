@@ -64,8 +64,11 @@ export async function POST(req: NextRequest) {
       success: true,
       document: docRecord,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Document upload error:', error);
-    return NextResponse.json({ error: error.message || 'Upload failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Upload failed' },
+      { status: 500 }
+    );
   }
 }

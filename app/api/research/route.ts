@@ -127,8 +127,11 @@ export async function POST(req: NextRequest) {
       facts: createdFacts,
       dataGaps: researchResult.dataGaps,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Research API error:', error);
-    return NextResponse.json({ error: error.message || 'Internal research error' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal research error' },
+      { status: 500 }
+    );
   }
 }
