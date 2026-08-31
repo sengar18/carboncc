@@ -37,7 +37,7 @@ export interface CalculationResult {
   originalInputs: Record<string, any>;
   normalizedInputs: Record<string, number>;
   outputs: {
-    estimatedAnnualAbatement_tCO2e?: number;
+    estimatedAnnualAbatement_tCO2e?: number | null;
     baselineEmissions_tCO2e?: number;
     projectEmissions_tCO2e?: number;
     leakageEmissions_tCO2e?: number;
