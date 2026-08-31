@@ -1,5 +1,5 @@
 // ==============================================================================
-// CARBONSCOUT INDIA — GEMINI AI PROVIDER (LIVE ADAPTER WITH SCHEMA ENFORCEMENT)
+// CARBONSCOUT INDIA — GROQ AI PROVIDER (LIVE ADAPTER WITH SCHEMA ENFORCEMENT)
 // ==============================================================================
 
 import { config } from '@/lib/config';
@@ -14,119 +14,119 @@ import {
   ReportGenerationSchema,
 } from './types';
 
-export class GeminiAIProvider implements IAIProvider {
-  name = 'GeminiAIProvider';
+export class GroqAIProvider implements IAIProvider {
+  name = 'GroqAIProvider';
   private apiKey: string;
-  private modelName = 'gemini-flash-latest';
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
+  private modelName = 'openai/gpt-oss-120b';
+  private endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
   constructor(apiKey?: string, modelName?: string) {
-    this.apiKey = apiKey || config.geminiApiKey || '';
+    this.apiKey = apiKey || config.groqApiKey || process.env.GROQ_API_KEY || '';
     if (modelName) {
       this.modelName = modelName;
     }
   }
 
-  private async callGemini(systemPrompt: string, userPrompt: string, responseJsonSchema?: any): Promise<string> {
+  private async callGroq(systemPrompt: string, userPrompt: string, jsonMode = true): Promise<string> {
     if (!this.apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured on the server.');
+      throw new Error('GROQ_API_KEY is not configured on the server.');
     }
-
-    const endpoint = `${this.baseUrl}/${this.modelName}:generateContent?key=${this.apiKey}`;
 
     const requestBody: any = {
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }],
-        },
+      model: this.modelName,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
       ],
-      generationConfig: {
-        temperature: 0.1,
-        topP: 0.95,
-      },
+      temperature: 0.1,
     };
 
-    if (responseJsonSchema) {
-      requestBody.generationConfig.responseMimeType = 'application/json';
-      requestBody.generationConfig.responseSchema = responseJsonSchema;
+    if (jsonMode) {
+      requestBody.response_format = { type: 'json_object' };
     }
 
-    const response = await fetch(endpoint, {
+    const response = await fetch(this.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        'User-Agent': 'CarbonScout-India/1.0',
       },
       body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errorText}`);
+      throw new Error(`Groq API error (${response.status}): ${errorText}`);
     }
 
     const result = await response.json();
-    const candidate = result.candidates?.[0];
-    if (!candidate || !candidate.content?.parts?.[0]?.text) {
-      throw new Error('Gemini API returned an empty or malformed candidate response.');
+    const content = result.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('Groq API returned an empty or malformed completion response.');
     }
 
-    return candidate.content.parts[0].text;
+    return content;
   }
 
   async verifyFacts(facts: Fact[]): Promise<FactVerificationResult[]> {
     if (!this.apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured on the server.');
+      throw new Error('GROQ_API_KEY is not configured on the server.');
     }
 
     const systemPrompt = `You are a strict Carbon Market Verification Agent for CarbonScout India.
 Given a list of enterprise facts, verify their internal consistency and plausibility against Indian industrial/agricultural benchmarks.
 Return a JSON array of verification results where each item has:
 - factId: string (exact id from input)
-- verifiedStatus: 'VERIFIED' | 'NEEDS_CONFIRMATION' | 'CONTRADICTORY'
-- confidenceScore: number (0.0 to 1.0)
-- reason: string (brief explanation)
+- assignedStatus: 'VERIFIED' | 'USER_PROVIDED' | 'INFERRED' | 'ESTIMATED' | 'UNVERIFIED' | 'UNKNOWN'
+- confidence: number (0.0 to 1.0)
+- reasoning: string (brief explanation)
 Only return valid JSON.`;
 
     const userPrompt = `Facts to verify:\n${JSON.stringify(facts, null, 2)}`;
-    const rawJson = await this.callGemini(systemPrompt, userPrompt);
-    
+    const rawJson = await this.callGroq(systemPrompt, userPrompt, true);
+
     try {
       const parsed = JSON.parse(rawJson);
-      return Array.isArray(parsed) ? parsed : [];
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed.results && Array.isArray(parsed.results)) return parsed.results;
+      return [];
     } catch {
       const cleanJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleanJson);
+      const parsed = JSON.parse(cleanJson);
+      return Array.isArray(parsed) ? parsed : parsed.results || [];
     }
   }
 
   async identifyDataGaps(facts: Fact[], sector: string): Promise<DataGapQuestion[]> {
     if (!this.apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured on the server.');
+      throw new Error('GROQ_API_KEY is not configured on the server.');
     }
 
     const systemPrompt = `You are an Indian Carbon Credit Trading Scheme (CCTS) Technical Auditor.
 Given a project sector and known project facts, identify missing operational/technical parameters required for official CCTS baseline and additionality calculations.
 Return a JSON array of DataGapQuestion items with:
-- id: string
-- parameterName: string
-- question: string
-- rationale: string
-- requiredForMethodology: string
-- priority: 'HIGH' | 'MEDIUM' | 'LOW'
-- inputType: 'number' | 'text' | 'boolean' | 'select'
+- key: string
+- questionText: string
+- explanation: string
+- criticality: 'HIGH' | 'MEDIUM' | 'LOW'
+- inputType: 'NUMBER' | 'BOOLEAN' | 'TEXT' | 'SELECT'
+- suggestedUnit?: string
 - options?: string[]
 Only return valid JSON.`;
 
     const userPrompt = `Sector: ${sector}\nKnown Facts:\n${JSON.stringify(facts, null, 2)}`;
-    const rawJson = await this.callGemini(systemPrompt, userPrompt);
-    
+    const rawJson = await this.callGroq(systemPrompt, userPrompt, true);
+
     try {
       const parsed = JSON.parse(rawJson);
-      return Array.isArray(parsed) ? parsed : [];
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed.questions && Array.isArray(parsed.questions)) return parsed.questions;
+      return [];
     } catch {
       const cleanJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleanJson);
+      const parsed = JSON.parse(cleanJson);
+      return Array.isArray(parsed) ? parsed : parsed.questions || [];
     }
   }
 
@@ -135,7 +135,7 @@ Only return valid JSON.`;
     candidateMethodologies: Methodology[]
   ): Promise<MethodologyMatchResult> {
     if (!this.apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured on the server.');
+      throw new Error('GROQ_API_KEY is not configured on the server.');
     }
 
     const systemPrompt = `You are an expert Indian CCTS Methodology Assessor.
@@ -143,18 +143,33 @@ Evaluate the project facts against candidate Bureau of Energy Efficiency (BEE) d
 Select the primary matched methodology, compute match confidence (0-100), identify qualifying evidence, missing required parameters, and risk factors.
 Return a single JSON object matching:
 {
-  "primaryMethodology": { "id": string, "code": string, "title": string, "sector": string, "type": "REDUCTION"|"REMOVAL"|"AVOIDANCE", "version": string },
-  "alternativeMethodologies": Array<{ id, code, title, reason }>,
-  "matchConfidence": number (0-100),
-  "qualifyingEvidence": Array<string>,
-  "missingRequiredParameters": Array<string>,
-  "riskFactors": Array<string>,
-  "reasoning": string
+  "methodologyCode": string,
+  "methodologyName": string,
+  "isSynthetic": boolean,
+  "matchStatus": "MATCH" | "POTENTIAL_MATCH" | "MISMATCH" | "INSUFFICIENT_INFORMATION",
+  "matchedConditions": string[],
+  "failedConditions": string[],
+  "missingConditions": string[],
+  "applicabilitySummary": string,
+  "preliminaryOpportunityScore": number (0-100),
+  "scoreCategory": "HIGH_PRELIMINARY_POTENTIAL" | "INVESTIGATE" | "WEAK_OR_UNCERTAIN" | "LOW_POTENTIAL",
+  "scoreBreakdown": {
+    "methodology_fit": { "score": number, "max": 25, "rationale": string },
+    "data_availability": { "score": number, "max": 20, "rationale": string },
+    "project_scale": { "score": number, "max": 15, "rationale": string },
+    "additionality_signal": { "score": number, "max": 15, "rationale": string },
+    "measurement_feasibility": { "score": number, "max": 10, "rationale": string },
+    "documentation": { "score": number, "max": 10, "rationale": string },
+    "commercial_potential": { "score": number, "max": 5, "rationale": string }
+  },
+  "redFlags": string[],
+  "uncertaintyNotes": string,
+  "nextSteps": string[]
 }
 Only return valid JSON.`;
 
     const userPrompt = `Project Facts:\n${JSON.stringify(facts, null, 2)}\n\nCandidate Methodologies:\n${JSON.stringify(candidateMethodologies, null, 2)}`;
-    const rawJson = await this.callGemini(systemPrompt, userPrompt);
+    const rawJson = await this.callGroq(systemPrompt, userPrompt, true);
 
     let parsed: any;
     try {
@@ -176,21 +191,24 @@ Only return valid JSON.`;
     matchResult: MethodologyMatchResult;
   }): Promise<ReportGenerationResult> {
     if (!this.apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured on the server.');
+      throw new Error('GROQ_API_KEY is not configured on the server.');
     }
 
     const systemPrompt = `You are a Senior Indian Carbon Markets Consultant.
 Generate an evidence-first Preliminary Opportunity Assessment Report for the enterprise project under the Indian Carbon Credit Trading Scheme (CCTS).
-Return a single JSON object with:
-- executiveSummary: string
-- methodologyApplicability: string
-- additionalityAssessment: string
-- riskAnalysis: Array<{ category: string, description: string, severity: 'LOW'|'MEDIUM'|'HIGH', mitigation: string }>
-- nextSteps: Array<string>
+Return a single JSON object matching:
+{
+  "executiveSummary": string,
+  "projectDescription": string,
+  "methodologyEvaluation": string,
+  "additionalityAnalysis": string,
+  "riskAssessment": string[],
+  "nextActionItems": string[]
+}
 Only return valid JSON.`;
 
     const userPrompt = `Project Details:\n${JSON.stringify(params, null, 2)}`;
-    const rawJson = await this.callGemini(systemPrompt, userPrompt);
+    const rawJson = await this.callGroq(systemPrompt, userPrompt, true);
 
     let parsed: any;
     try {

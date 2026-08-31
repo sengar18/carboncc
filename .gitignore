@@ -57,3 +57,4 @@ tmp/
 temp/
 scratch/
 .user_uploaded/
+supabase/.temp/

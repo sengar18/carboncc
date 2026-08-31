@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: 'Evidence-first preliminary carbon project opportunity screening for Indian commercial enterprises.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: {

@@ -37,11 +37,11 @@ export interface CalculationResult {
   originalInputs: Record<string, any>;
   normalizedInputs: Record<string, number>;
   outputs: {
-    estimatedAnnualAbatement_tCO2e?: number;
-    baselineEmissions_tCO2e?: number;
-    projectEmissions_tCO2e?: number;
-    leakageEmissions_tCO2e?: number;
-    uncertaintyRange_pct?: number;
+    estimatedAnnualAbatement_tCO2e?: number | null;
+    baselineEmissions_tCO2e?: number | null;
+    projectEmissions_tCO2e?: number | null;
+    leakageEmissions_tCO2e?: number | null;
+    uncertaintyRange_pct?: number | null;
   };
   provenanceCitations?: CalculationProvenanceCitation[];
   assumptions: string[];

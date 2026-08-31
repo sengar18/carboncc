@@ -43,7 +43,7 @@ describe('End-to-End Mock Assessment Loop', () => {
     });
 
     // Step 3: Run Research
-    const researchProvider = getResearchProvider();
+    const researchProvider = getResearchProvider('mock');
     const research = await researchProvider.researchCompany('Doaba Agro', undefined, 'Punjab');
     expect(research.sources.length).toBeGreaterThan(0);
     expect(research.extractedFacts.length).toBeGreaterThan(0);
@@ -73,7 +73,7 @@ describe('End-to-End Mock Assessment Loop', () => {
     expect(initialFacts.length).toBe(research.extractedFacts.length);
 
     // Step 5 & 6: Identify Data Gaps
-    const aiProvider = getAIProvider();
+    const aiProvider = getAIProvider('mock');
     const dataGaps = await aiProvider.identifyDataGaps(initialFacts, 'Biomass Energy / Cogeneration');
     expect(dataGaps.length).toBeGreaterThan(0);
 

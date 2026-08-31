@@ -1,0 +1,6 @@
+{
+  "name": "CarbonScout India",
+  "description": "Evidence-First Carbon Opportunity Intelligence Platform for Indian Enterprises",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

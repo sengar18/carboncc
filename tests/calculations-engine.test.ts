@@ -54,7 +54,7 @@ describe('Deterministic Calculation Engine', () => {
     expect(result.status).toBe('INSUFFICIENT_DATA');
     expect(result.missingInputs).toBeDefined();
     expect(result.missingInputs!.length).toBeGreaterThan(0);
-    expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeUndefined();
+    expect(result.outputs.estimatedAnnualAbatement_tCO2e).toBeNull();
     expect(result.assumptions).toContain('Never substitute guessed values into emission reduction models.');
   });
 });
