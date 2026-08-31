@@ -237,5 +237,19 @@ CREATE POLICY "Service full access facts" ON facts USING (true) WITH CHECK (true
 CREATE POLICY "Service full access sources" ON research_sources USING (true) WITH CHECK (true);
 CREATE POLICY "Service full access assessments" ON assessments USING (true) WITH CHECK (true);
 CREATE POLICY "Service full access questions" ON questions USING (true) WITH CHECK (true);
-CREATE POLICY "Service full access documents" ON documents USING (true) WITH CHECK (true);
 CREATE POLICY "Service full access audit_logs" ON audit_logs USING (true) WITH CHECK (true);
+CREATE POLICY "Service full access calculation_runs" ON calculation_runs USING (true) WITH CHECK (true);
+CREATE POLICY "Service full access contacts" ON contacts USING (true) WITH CHECK (true);
+CREATE POLICY "Service full access methodology_requirements" ON methodology_requirements USING (true) WITH CHECK (true);
+CREATE POLICY "Service full access assessment_inputs" ON assessment_inputs USING (true) WITH CHECK (true);
+
+-- Grant schema & table permissions to Supabase PostgREST roles (Row-Level Security enforces access boundaries)
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
+
