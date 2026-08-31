@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     // Append any user provided facts to the store
     if (userProvidedFacts && Array.isArray(userProvidedFacts)) {
       for (const uf of userProvidedFacts) {
-        const factId = `fact-user-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+        const factId = `fact-user-${Date.now()}-${crypto.randomUUID()}`;
         memoryStore.facts.set(factId, {
           id: factId,
           project_id: projectId,

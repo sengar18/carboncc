@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     // Save Research Sources
     const createdSources: ResearchSource[] = [];
     for (const src of researchResult.sources) {
-      const sourceId = `src-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const sourceId = `src-${Date.now()}-${crypto.randomUUID()}`;
       const sourceRecord: ResearchSource = {
         id: sourceId,
         project_id: currentProjectId,
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     // Save Extracted Facts with strict provenance
     const createdFacts: Fact[] = [];
     for (const ef of researchResult.extractedFacts) {
-      const factId = `fact-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      const factId = `fact-${Date.now()}-${crypto.randomUUID()}`;
       const matchingSource = createdSources.find((s) => s.url === ef.sourceUrl);
 
       const factRecord: Fact = {
