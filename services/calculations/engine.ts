@@ -62,6 +62,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: [
           'Calculation halted: Missing mandatory input parameter NET_ELECTRICITY_DELIVERED_MWH',
@@ -86,6 +87,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: ['Generation must be a positive number in MWh.'],
         explanation: 'Invalid numeric input provided for net electricity generation.',
@@ -210,6 +212,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: [
           'Calculation halted: Missing mandatory input parameter HYDROGEN_PRODUCED_TONS',
@@ -234,6 +237,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: ['Hydrogen output must be a positive number.'],
         explanation: 'Invalid numeric input for hydrogen production.',
@@ -344,6 +348,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: [
           'Calculation halted: Missing mandatory input parameter ANNUAL_CBG_PRODUCED_TONS',
@@ -368,6 +373,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: ['CBG production must be a positive number.'],
         explanation: 'Invalid numeric input for CBG production.',
@@ -388,6 +394,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: [
           'BM WA03.003 Equations (18) and (46) require specific baseline fossil fuel displacement parameters.',
@@ -412,6 +419,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: ['Displacement factor must be a valid positive number.'],
         explanation: 'Invalid numeric input for CBG displacement factor.',
@@ -511,6 +519,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: [
           'BM EN01.003 requires detailed plant baseline scenario identification (Scenarios 1-14 per Section 4.2).',
@@ -535,6 +544,7 @@ export class CalculationEngine {
         originalInputs: rawInputsMap,
         normalizedInputs: {},
         outputs: { estimatedAnnualAbatement_tCO2e: null },
+        outputs: {},
         provenanceCitations: citations,
         assumptions: ['Generation must be a positive number in MWh.'],
         explanation: 'Invalid numeric input provided for net electricity generation.',
@@ -619,6 +629,7 @@ export class CalculationEngine {
       originalInputs: inputs.reduce((acc, i) => ({ ...acc, [i.key]: i.valueRaw }), {}),
       normalizedInputs: {},
       outputs: { estimatedAnnualAbatement_tCO2e: null },
+      outputs: {},
       assumptions: [
         'Calculation halted: Specific verified baseline data and equipment parameters required before calculating emission reductions.',
         'Never return invented carbon numbers.',

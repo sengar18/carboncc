@@ -153,8 +153,8 @@ export default function AssessmentWizardPage() {
       setQuestions(asmtData.questions);
 
       setCurrentStep(4);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'An error occurred during research.');
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'An error occurred during research.');
     } finally {
       setIsLoading(false);
     }
@@ -186,8 +186,8 @@ export default function AssessmentWizardPage() {
       setReport(data.report);
 
       setCurrentStep(9);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Assessment calculation error');
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Assessment calculation error');
     } finally {
       setIsLoading(false);
     }

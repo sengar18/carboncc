@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     // Append any user provided facts to the store
     if (userProvidedFacts && Array.isArray(userProvidedFacts)) {
       for (const uf of userProvidedFacts) {
-        const factId = `fact-user-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+        const factId = `fact-user-${Date.now()}-${crypto.randomUUID()}`;
         memoryStore.facts.set(factId, {
           id: factId,
           project_id: projectId,
@@ -129,8 +129,11 @@ export async function POST(req: NextRequest) {
       assessment,
       questions: createdQuestions,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Create assessment error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to create assessment' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to create assessment' },
+      { status: 500 }
+    );
   }
 }

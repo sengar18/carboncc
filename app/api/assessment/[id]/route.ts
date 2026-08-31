@@ -90,7 +90,7 @@ export async function POST(
           existingFact.confidence = 1.0;
           existingFact.updated_at = new Date().toISOString();
         } else {
-          const factId = `fact-ans-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+          const factId = `fact-ans-${Date.now()}-${crypto.randomUUID()}`;
           memoryStore.facts.set(factId, {
             id: factId,
             project_id: project.id,
@@ -138,7 +138,7 @@ export async function POST(
         missingInputs: ['Applicable CCTS methodology match required before running calculations'],
         originalInputs: {},
         normalizedInputs: {},
-        outputs: { estimatedAnnualAbatement_tCO2e: null as any },
+        outputs: {},
         assumptions: ['No verified official methodology matched the provided project facts.'],
         explanation: 'Calculation skipped: No applicable CCTS methodology matched the project scope and facts.',
         executedAt: new Date().toISOString(),
@@ -243,8 +243,11 @@ export async function POST(
       report,
       matchSummary,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Execute assessment error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to execute assessment' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to execute assessment' },
+      { status: 500 }
+    );
   }
 }
