@@ -65,8 +65,8 @@ export class FirecrawlResearchProvider implements IResearchProvider {
         retrievedAt: new Date().toISOString(),
         contentHash: this.hashString(markdown),
       };
-    } catch (err: any) {
-      console.error(`Firecrawl scraping failed for ${url}:`, err.message);
+    } catch (err) {
+      console.error(`Firecrawl scraping failed for ${url}:`, err instanceof Error ? err.message : 'Unknown error');
       return null;
     }
   }
