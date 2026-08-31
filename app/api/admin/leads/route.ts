@@ -110,8 +110,11 @@ export async function PATCH(req: NextRequest) {
       success: true,
       project,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Lead update error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to update lead' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to update lead' },
+      { status: 500 }
+    );
   }
 }
