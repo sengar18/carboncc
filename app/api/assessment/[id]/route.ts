@@ -138,7 +138,7 @@ export async function POST(
         missingInputs: ['Applicable CCTS methodology match required before running calculations'],
         originalInputs: {},
         normalizedInputs: {},
-        outputs: { estimatedAnnualAbatement_tCO2e: null as any },
+        outputs: { estimatedAnnualAbatement_tCO2e: null },
         assumptions: ['No verified official methodology matched the provided project facts.'],
         explanation: 'Calculation skipped: No applicable CCTS methodology matched the project scope and facts.',
         executedAt: new Date().toISOString(),
