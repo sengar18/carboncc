@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
     if (userProvidedFacts && Array.isArray(userProvidedFacts)) {
       for (const uf of userProvidedFacts) {
         const factId = `fact-user-${Date.now()}-${crypto.randomUUID().split('-')[0]}`;
+        const factId = `fact-user-${Date.now()}-${crypto.randomUUID()}`;
         memoryStore.facts.set(factId, {
           id: factId,
           project_id: projectId,

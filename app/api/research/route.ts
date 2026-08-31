@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
     const createdSources: ResearchSource[] = [];
     for (const src of researchResult.sources) {
       const sourceId = `src-${Date.now()}-${crypto.randomUUID().split('-')[0]}`;
+      const sourceId = `src-${Date.now()}-${crypto.randomUUID()}`;
       const sourceRecord: ResearchSource = {
         id: sourceId,
         project_id: currentProjectId,
@@ -85,6 +86,7 @@ export async function POST(req: NextRequest) {
     const createdFacts: Fact[] = [];
     for (const ef of researchResult.extractedFacts) {
       const factId = `fact-${Date.now()}-${crypto.randomUUID().split('-')[0]}`;
+      const factId = `fact-${Date.now()}-${crypto.randomUUID()}`;
       const matchingSource = createdSources.find((s) => s.url === ef.sourceUrl);
 
       const factRecord: Fact = {
