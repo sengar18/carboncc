@@ -5,6 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--include=dev"
+  SECRETS_SCAN_OMIT_KEYS = "NODE_ENV,DATABASE_PROVIDER,RESEARCH_PROVIDER,AI_PROVIDER"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
