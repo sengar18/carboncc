@@ -7,6 +7,7 @@ import { getResearchProvider } from '@/services/research';
 import { db } from '@/lib/db';
 import { logAuditEvent } from '@/lib/audit';
 import { Fact, ResearchSource } from '@/lib/db/schema';
+import { isValidUUID, generateUUID } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,14 +21,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const currentProjectId = projectId || `proj-${Date.now()}`;
-    const currentOrgId = orgId || `org-${Date.now()}`;
-
-    // Ensure Organization exists in DB
-    const existingOrg = await db.getOrganizationById(currentOrgId);
+    // Ensure Organization exists in DB with valid UUID
+    let existingOrg = orgId && isValidUUID(orgId) ? await db.getOrganizationById(orgId) : undefined;
     if (!existingOrg) {
-      await db.createOrganization({
-        id: currentOrgId,
+      existingOrg = await db.createOrganization({
+        id: orgId && isValidUUID(orgId) ? orgId : generateUUID(),
         name: companyName,
         industry_sector: sector || 'Rice / Food Processing',
         state,
@@ -36,12 +34,13 @@ export async function POST(req: NextRequest) {
         updated_at: new Date().toISOString(),
       });
     }
+    const currentOrgId = existingOrg.id;
 
-    // Ensure Project exists in DB
-    const existingProj = await db.getProjectById(currentProjectId);
+    // Ensure Project exists in DB with valid UUID
+    let existingProj = projectId && isValidUUID(projectId) ? await db.getProjectById(projectId) : undefined;
     if (!existingProj) {
-      await db.createProject({
-        id: currentProjectId,
+      existingProj = await db.createProject({
+        id: projectId && isValidUUID(projectId) ? projectId : generateUUID(),
         organization_id: currentOrgId,
         title: `${companyName} Clean Energy & Bio-Residue Project`,
         sector: sector || 'Rice / Food Processing',
@@ -52,6 +51,7 @@ export async function POST(req: NextRequest) {
         updated_at: new Date().toISOString(),
       });
     }
+    const currentProjectId = existingProj.id;
 
     await logAuditEvent({
       entityType: 'PROJECT',
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     // Save Research Sources
     const createdSources: ResearchSource[] = [];
     for (const src of researchResult.sources) {
-      const sourceId = `src-${Date.now()}-${crypto.randomUUID()}`;
+      const sourceId = generateUUID();
       const sourceRecord: ResearchSource = {
         id: sourceId,
         project_id: currentProjectId,
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     // Save Extracted Facts with strict provenance
     const createdFacts: Fact[] = [];
     for (const ef of researchResult.extractedFacts) {
-      const factId = `fact-${Date.now()}-${crypto.randomUUID()}`;
+      const factId = generateUUID();
       const matchingSource = createdSources.find((s) => s.url === ef.sourceUrl);
 
       const factRecord: Fact = {

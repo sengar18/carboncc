@@ -10,6 +10,7 @@ import { validateUploadedFile } from '@/lib/storage/validator';
 import { logAuditEvent } from '@/lib/audit';
 import { DocumentRecord } from '@/lib/db/schema';
 import { sha256 } from '@/lib/provenance';
+import { isValidUUID, generateUUID } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,9 +18,9 @@ export async function POST(req: NextRequest) {
     const file = formData.get('file') as File | null;
     const projectId = formData.get('projectId') as string | null;
 
-    if (!file || !projectId) {
+    if (!file || !projectId || !isValidUUID(projectId)) {
       return NextResponse.json(
-        { error: 'File and projectId are required fields.' },
+        { error: 'Valid file and projectId are required.' },
         { status: 400 }
       );
     }
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const docId = `doc-${Date.now()}`;
+    const docId = generateUUID();
     const contentHash = sha256(Buffer.from(await file.arrayBuffer()));
     const storagePath = `metadata-only://projects/${projectId}/documents/${validation.sanitizedFilename}`;
 

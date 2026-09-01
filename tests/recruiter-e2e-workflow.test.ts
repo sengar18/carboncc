@@ -11,9 +11,9 @@ import { Fact, Assessment, CalculationRun } from '@/lib/db/schema';
 
 describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
   it('Scenario 1: Full Valid Indian Enterprise Assessment (Biomass Cogeneration)', async () => {
-    const orgId = `org-recruiter-${Date.now()}`;
-    const projectId = `proj-recruiter-${Date.now()}`;
-    const asmtId = `asmt-recruiter-${Date.now()}`;
+    const orgId = crypto.randomUUID();
+    const projectId = crypto.randomUUID();
+    const asmtId = crypto.randomUUID();
 
     // 1. Create Organization & Project in DB
     const org = await db.createOrganization({
@@ -49,7 +49,7 @@ describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
     // Persist discovered facts
     for (const ef of research.extractedFacts) {
       await db.createFact({
-        id: `fact-res-${Date.now()}-${crypto.randomUUID()}`,
+        id: crypto.randomUUID(),
         project_id: projectId,
         fact_type: ef.factType,
         value_raw: ef.valueRaw,
@@ -67,7 +67,7 @@ describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
 
     // 3. User provides verified operating parameters & Gazette applicability criteria
     await db.createFact({
-      id: `fact-user-biomass-${Date.now()}`,
+      id: crypto.randomUUID(),
       project_id: projectId,
       fact_type: 'BIOMASS_FEEDSTOCK_QUANTITY_MT',
       value_raw: '12000',
@@ -82,7 +82,7 @@ describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
     });
 
     await db.createFact({
-      id: `fact-user-energy-${Date.now()}`,
+      id: crypto.randomUUID(),
       project_id: projectId,
       fact_type: 'NET_ELECTRICITY_GENERATION_MWH',
       value_raw: '4800',
@@ -97,7 +97,7 @@ describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
     });
 
     await db.createFact({
-      id: `fact-user-cond1-${Date.now()}`,
+      id: crypto.randomUUID(),
       project_id: projectId,
       fact_type: 'BIOMASS_FEEDSTOCK_ALLOWED',
       value_raw: 'true',
@@ -110,7 +110,7 @@ describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
     });
 
     await db.createFact({
-      id: `fact-user-cond2-${Date.now()}`,
+      id: crypto.randomUUID(),
       project_id: projectId,
       fact_type: 'FOSSIL_COFIRING_RATIO',
       value_raw: '0',
@@ -125,7 +125,7 @@ describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
     });
 
     await db.createFact({
-      id: `fact-user-cond3-${Date.now()}`,
+      id: crypto.randomUUID(),
       project_id: projectId,
       fact_type: 'BIOMASS_STORAGE_PERIOD_YEARS',
       value_raw: '0.5',
@@ -140,7 +140,7 @@ describe('Recruiter-Grade End-to-End Workflow & Rigor Validation', () => {
     });
 
     await db.createFact({
-      id: `fact-user-cond4-${Date.now()}`,
+      id: crypto.randomUUID(),
       project_id: projectId,
       fact_type: 'NO_PRIOR_CHEMICAL_BIOLOGICAL_TREATMENT',
       value_raw: 'true',

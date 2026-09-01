@@ -263,7 +263,7 @@ export class MemoryStore {
   public addAuditLog(log: Omit<AuditLog, 'id' | 'created_at'>): AuditLog {
     const newLog: AuditLog = {
       ...log,
-      id: `audit-${Date.now()}-${crypto.randomUUID()}`,
+      id: crypto.randomUUID(),
       created_at: new Date().toISOString(),
     };
     this.auditLogs.push(newLog);

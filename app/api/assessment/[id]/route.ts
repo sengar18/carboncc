@@ -11,12 +11,16 @@ import { EnvironmentalPathwayScreener } from '@/services/methodology/pathway-scr
 import { getAIProvider } from '@/services/ai';
 import { logAuditEvent } from '@/lib/audit';
 import { CalculationRun, Fact } from '@/lib/db/schema';
+import { isValidUUID, generateUUID } from '@/lib/utils';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  if (!id || !isValidUUID(id)) {
+    return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
+  }
   const assessment = await db.getAssessmentById(id);
 
   if (!assessment) {
@@ -54,6 +58,9 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+    if (!id || !isValidUUID(id)) {
+      return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
+    }
     const body = await req.json();
     const { answers } = body; // Map of question_key -> user_response
 
@@ -100,7 +107,7 @@ export async function POST(
             updated_at: new Date().toISOString(),
           });
         } else {
-          const factId = `fact-ans-${Date.now()}-${crypto.randomUUID()}`;
+          const factId = generateUUID();
           await db.createFact({
             id: factId,
             project_id: project.id,
@@ -156,7 +163,7 @@ export async function POST(
     }
 
     // Save Calculation Run Record
-    const runId = `calc-run-${Date.now()}`;
+    const runId = generateUUID();
     const runRecord: CalculationRun = {
       id: runId,
       assessment_id: id,

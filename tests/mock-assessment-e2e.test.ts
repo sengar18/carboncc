@@ -10,8 +10,8 @@ import { Fact, Assessment, CalculationRun } from '@/lib/db/schema';
 
 describe('End-to-End Mock Assessment Loop', () => {
   it('should execute the full 9-step mock assessment workflow deterministically against official CCTS methodology', async () => {
-    const projectId = 'proj-e2e-test-001';
-    const orgId = 'org-e2e-test-001';
+    const projectId = '00000000-0000-4000-8000-000000000002';
+    const orgId = '00000000-0000-4000-8000-000000000001';
 
     // Step 1 & 2: Create Organization & Project
     memoryStore.organizations.set(orgId, {
@@ -43,14 +43,14 @@ describe('End-to-End Mock Assessment Loop', () => {
     });
 
     // Step 3: Run Research
-const researchProvider = getResearchProvider('mock');
+    const researchProvider = getResearchProvider('mock');
     const research = await researchProvider.researchCompany('Doaba Agro', undefined, 'Punjab');
     expect(research.sources.length).toBeGreaterThan(0);
     expect(research.extractedFacts.length).toBeGreaterThan(0);
 
     // Save facts into store
     for (const ef of research.extractedFacts) {
-const factId = `fact-${Date.now()}-${crypto.randomUUID()}`;
+      const factId = crypto.randomUUID();
       memoryStore.facts.set(factId, {
         id: factId,
         project_id: projectId,
@@ -73,13 +73,13 @@ const factId = `fact-${Date.now()}-${crypto.randomUUID()}`;
     expect(initialFacts.length).toBe(research.extractedFacts.length);
 
     // Step 5 & 6: Identify Data Gaps
-const aiProvider = getAIProvider('mock');
+    const aiProvider = getAIProvider('mock');
     const dataGaps = await aiProvider.identifyDataGaps(initialFacts, 'Biomass Energy / Cogeneration');
     expect(dataGaps.length).toBeGreaterThan(0);
 
     // Step 7: Answer Questions / Provide missing data
     const answeredBiomassMT = 8500;
-    const answeredFactId = `fact-biomass-${Date.now()}`;
+    const answeredFactId = crypto.randomUUID();
     memoryStore.facts.set(answeredFactId, {
       id: answeredFactId,
       project_id: projectId,
@@ -95,7 +95,7 @@ const aiProvider = getAIProvider('mock');
       updated_at: new Date().toISOString(),
     });
 
-    const answeredEnergyId = `fact-energy-${Date.now()}`;
+    const answeredEnergyId = crypto.randomUUID();
     memoryStore.facts.set(answeredEnergyId, {
       id: answeredEnergyId,
       project_id: projectId,
@@ -163,7 +163,7 @@ const aiProvider = getAIProvider('mock');
     expect(report.recommendedNextSteps.length).toBeGreaterThan(0);
 
     // Save assessment record & update CRM status
-    const asmtId = 'asmt-e2e-001';
+    const asmtId = '00000000-0000-4000-8000-000000000003';
     const assessmentRecord: Assessment = {
       id: asmtId,
       project_id: projectId,

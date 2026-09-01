@@ -8,6 +8,7 @@ import { getAIProvider } from '@/services/ai';
 import { methodologyMatcher } from '@/services/methodology/matcher';
 import { logAuditEvent } from '@/lib/audit';
 import { Assessment, Question } from '@/lib/db/schema';
+import { isValidUUID, generateUUID } from '@/lib/utils';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -32,8 +33,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { projectId, sector, userProvidedFacts } = body;
 
-    if (!projectId) {
-      return NextResponse.json({ error: 'projectId is required.' }, { status: 400 });
+    if (!projectId || !isValidUUID(projectId)) {
+      return NextResponse.json({ error: 'Valid projectId is required.' }, { status: 400 });
     }
 
     const project = await db.getProjectById(projectId);
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
     // Append any user provided facts to the store
     if (userProvidedFacts && Array.isArray(userProvidedFacts)) {
       for (const uf of userProvidedFacts) {
-        const factId = `fact-user-${Date.now()}-${crypto.randomUUID()}`;
+        const factId = generateUUID();
         await db.createFact({
           id: factId,
           project_id: projectId,
@@ -74,8 +75,8 @@ export async function POST(req: NextRequest) {
       ? `meth-${initialMatch.methodologyCode.toLowerCase().replace(/[^a-z0-9]/g, '-')}`
       : 'PENDING_MATCH';
 
-    // 3. Create Assessment record
-    const assessmentId = `asmt-${Date.now()}`;
+    // 3. Create Assessment record with valid UUID
+    const assessmentId = generateUUID();
     const assessment: Assessment = {
       id: assessmentId,
       project_id: projectId,
@@ -101,10 +102,10 @@ export async function POST(req: NextRequest) {
     };
     await db.createAssessment(assessment);
 
-    // 3. Save Questions
+    // 4. Save Questions
     const createdQuestions: Question[] = [];
     for (const dg of dataGaps) {
-      const qId = `q-${Date.now()}-${dg.key.toLowerCase()}`;
+      const qId = generateUUID();
       const qRecord: Question = {
         id: qId,
         assessment_id: assessmentId,
