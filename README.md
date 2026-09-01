@@ -81,14 +81,14 @@ cd carbonscout-india
 # Install dependencies
 npm install
 
-# Run automated test suites (38 tests)
-npm test
+# Run validation directly from the local dependency tree
+./node_modules/.bin/vitest run
 
 # Run TypeScript typecheck
-npm run typecheck
+./node_modules/.bin/tsc --noEmit
 
 # Build Next.js production bundle
-npm run build
+./node_modules/.bin/next build
 
 # Start development server
 npm run dev
@@ -104,17 +104,19 @@ cp .env.example .env.local
 ```
 
 ### Environment Variables
-- `AI_PROVIDER`: `mock` (default for zero-credit testing) | `gemini` | `openai`
+- `AI_PROVIDER`: `mock` (local zero-credit testing) | `groq` (production)
 - `RESEARCH_PROVIDER`: `mock` (default for zero-credit testing) | `firecrawl`
 - `DATABASE_PROVIDER`: `mock_memory` (default) | `supabase`
-- `GEMINI_API_KEY`: Server-only Google Gemini API key
-- `OPENAI_API_KEY`: Server-only OpenAI API key
+- `GROQ_API_KEY`: Server-only Groq API key; production model is `openai/gpt-oss-120b`
 - `FIRECRAWL_API_KEY`: Server-only Firecrawl API key
 - `NEXT_PUBLIC_SUPABASE_URL`: Client-accessible Supabase URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Client-accessible Supabase anonymous key
 - `SUPABASE_SERVICE_ROLE_KEY`: Server-only Supabase service role key
+- `ADMIN_SECRET_KEY`: Server-only administrator secret for the CRM login and API guard
 
 *Security Note: In production mode (`NODE_ENV=production`), mock providers are automatically gated and cannot be initialized.*
+
+Production provider configuration uses `AI_PROVIDER=groq`, `RESEARCH_PROVIDER=firecrawl`, and `DATABASE_PROVIDER=supabase`. The document endpoint currently records validated metadata and a SHA-256 content digest only; it does not claim to store document binaries.
 
 ---
 

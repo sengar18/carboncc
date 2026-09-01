@@ -210,6 +210,7 @@ export interface DocumentRecord {
   storage_path: string;
   file_size_bytes: number;
   mime_type: string;
+  content_hash?: string;
   document_type: 'AUDIT_REPORT' | 'ELECTRICITY_BILL' | 'PRODUCTION_LOG' | 'WEIGHBRIDGE_RECORD' | 'ENVIRONMENTAL_CLEARANCE' | 'GENERAL';
   upload_status: 'UPLOADED' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
   extracted_text_preview?: string;

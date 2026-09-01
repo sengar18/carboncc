@@ -6,8 +6,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { logAuditEvent } from '@/lib/audit';
 import { PipelineStatus } from '@/lib/db/schema';
+import { isAdminRequestAuthorized } from '@/lib/admin-auth';
 
 export async function GET(req: NextRequest) {
+  if (!isAdminRequestAuthorized(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get('projectId');
 
@@ -73,6 +75,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  if (!isAdminRequestAuthorized(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await req.json();
     const { projectId, pipelineStatus, notes } = body;

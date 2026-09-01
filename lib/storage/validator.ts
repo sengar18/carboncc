@@ -20,6 +20,7 @@ export interface FileValidationResult {
 }
 
 const ALLOWED_EXTENSIONS = ['.pdf', '.csv', '.xlsx', '.xls', '.docx'];
+const MAX_DOCUMENT_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 export function sanitizeFilename(filename: string): string {
   // Remove directory traversal characters and special characters
@@ -57,8 +58,9 @@ export function validateUploadedFile(file: {
     return { valid: false, error: 'File is empty (0 bytes).' };
   }
 
-  if (file.size > config.maxUploadSizeBytes) {
-    const maxMb = (config.maxUploadSizeBytes / (1024 * 1024)).toFixed(0);
+  const maxUploadBytes = Math.min(config.maxUploadSizeBytes, MAX_DOCUMENT_UPLOAD_BYTES);
+  if (file.size > maxUploadBytes) {
+    const maxMb = (maxUploadBytes / (1024 * 1024)).toFixed(0);
     return { valid: false, error: `File size exceeds the maximum allowed limit of ${maxMb}MB.` };
   }
 

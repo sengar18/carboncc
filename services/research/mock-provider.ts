@@ -3,6 +3,7 @@
 // ==============================================================================
 
 import { IResearchProvider, ResearchAnalysisResult, RawResearchResult, ExtractedFactCandidate } from './types';
+import { sha256 } from '@/lib/provenance';
 
 export class MockResearchProvider implements IResearchProvider {
   name = 'MockResearchProvider';
@@ -18,14 +19,14 @@ export class MockResearchProvider implements IResearchProvider {
         title: `${cleanName} — Corporate Overview & Industrial Operations`,
         content: `${cleanName} operates modern commercial processing and production facilities based in ${state}, India. Annual agro-feedstock processing capacity is estimated at 35,000–50,000 MT per annum, generating steady volumes of agricultural biomass byproduct and captive thermal demand.`,
         retrievedAt: new Date().toISOString(),
-        contentHash: 'mock-hash-src-001',
+        contentHash: sha256(`${cleanName} operates modern commercial processing and production facilities based in ${state}, India. Annual agro-feedstock processing capacity is estimated at 35,000–50,000 MT per annum, generating steady volumes of agricultural biomass byproduct and captive thermal demand.`),
       },
       {
         url: `${cleanWeb}/sustainability`,
         title: `${cleanName} — Energy & Environmental Baseline`,
         content: `Energy infrastructure at ${cleanName}: The plant consumes electrical power from the state grid (DISCOM) at 11kV/33kV and operates captive steam boilers utilizing solid agro-residues. No registered carbon credit project exists on the national or international registry to date.`,
         retrievedAt: new Date().toISOString(),
-        contentHash: 'mock-hash-src-002',
+        contentHash: sha256(`Energy infrastructure at ${cleanName}: The plant consumes electrical power from the state grid (DISCOM) at 11kV/33kV and operates captive steam boilers utilizing solid agro-residues. No registered carbon credit project exists on the national or international registry to date.`),
       },
     ];
 

@@ -38,7 +38,7 @@ describe('Fact Classification & Provenance Tracking', () => {
 
     for (const source of result.sources) {
       expect(source.contentHash).toBeDefined();
-      expect(source.contentHash.length).toBeGreaterThan(0);
+      expect(source.contentHash).toMatch(/^[a-f0-9]{64}$/);
       expect(source.retrievedAt).toBeDefined();
     }
   });

@@ -9,6 +9,7 @@ import { db } from '@/lib/db';
 import { validateUploadedFile } from '@/lib/storage/validator';
 import { logAuditEvent } from '@/lib/audit';
 import { DocumentRecord } from '@/lib/db/schema';
+import { sha256 } from '@/lib/provenance';
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,7 +35,8 @@ export async function POST(req: NextRequest) {
     }
 
     const docId = `doc-${Date.now()}`;
-    const storagePath = `projects/${projectId}/documents/${validation.sanitizedFilename}`;
+    const contentHash = sha256(Buffer.from(await file.arrayBuffer()));
+    const storagePath = `metadata-only://projects/${projectId}/documents/${validation.sanitizedFilename}`;
 
     const docRecord: DocumentRecord = {
       id: docId,
@@ -43,9 +45,10 @@ export async function POST(req: NextRequest) {
       storage_path: storagePath,
       file_size_bytes: file.size,
       mime_type: file.type,
+      content_hash: contentHash,
       document_type: validation.documentType || 'GENERAL',
       upload_status: 'PROCESSED',
-      extracted_text_preview: `Validated document "${file.name}" (${(file.size / 1024).toFixed(1)} KB). Categorized as ${validation.documentType}.`,
+      extracted_text_preview: `Validated metadata for "${file.name}" (${(file.size / 1024).toFixed(1)} KB). Binary content is not stored by this endpoint.`,
       created_at: new Date().toISOString(),
     };
 
@@ -59,12 +62,14 @@ export async function POST(req: NextRequest) {
         fileName: file.name,
         fileSizeBytes: file.size,
         documentType: docRecord.document_type,
+        contentHash,
       },
     });
 
     return NextResponse.json({
       success: true,
       document: docRecord,
+      storage: { mode: 'metadata_only', binaryStored: false },
     });
   } catch (error) {
     console.error('Document upload error:', error);

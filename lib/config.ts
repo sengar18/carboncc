@@ -33,7 +33,7 @@ export const config: AppConfig = {
   groqApiKey: process.env.GROQ_API_KEY,
   openaiApiKey: process.env.OPENAI_API_KEY,
   firecrawlApiKey: process.env.FIRECRAWL_API_KEY,
-  maxUploadSizeBytes: parseInt(process.env.MAX_UPLOAD_SIZE_BYTES || '15728640', 10), // 15MB
+  maxUploadSizeBytes: parseInt(process.env.MAX_UPLOAD_SIZE_BYTES || '10485760', 10), // 10MB hard cap
   allowedFileTypes: (
     process.env.ALLOWED_FILE_TYPES ||
     'application/pdf,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document'

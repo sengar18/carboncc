@@ -5,6 +5,7 @@
 // ==============================================================================
 
 import { config } from '@/lib/config';
+import { sha256 } from '@/lib/provenance';
 import { IResearchProvider, ResearchAnalysisResult, RawResearchResult, ExtractedFactCandidate } from './types';
 
 export class FirecrawlResearchProvider implements IResearchProvider {
@@ -14,16 +15,6 @@ export class FirecrawlResearchProvider implements IResearchProvider {
 
   constructor(apiKey?: string) {
     this.apiKey = apiKey || config.firecrawlApiKey || '';
-  }
-
-  private hashString(str: string): string {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0;
-    }
-    return Math.abs(hash).toString(16);
   }
 
   async scrapeUrl(url: string, timeoutMs = 15000): Promise<RawResearchResult | null> {
@@ -57,15 +48,15 @@ export class FirecrawlResearchProvider implements IResearchProvider {
       }
 
       const json = await response.json();
-      const markdown = json.data?.markdown || '';
+      const markdown = (json.data?.markdown || '').slice(0, 5000);
       const title = json.data?.metadata?.title || url;
 
       return {
         url,
         title,
-        content: markdown.slice(0, 5000), // Protect context limits
+        content: markdown,
         retrievedAt: new Date().toISOString(),
-        contentHash: this.hashString(markdown),
+        contentHash: sha256(markdown),
       };
 } catch (err) {
       console.error(`Firecrawl scraping failed for ${url}:`, err instanceof Error ? err.message : 'Unknown error');

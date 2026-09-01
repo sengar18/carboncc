@@ -25,10 +25,10 @@ describe('Document Upload Validator', () => {
     expect(result.documentType).toBe('WEIGHBRIDGE_RECORD');
   });
 
-  it('should reject files exceeding 15MB size limit', () => {
+  it('should reject files exceeding the strict 10MB size limit', () => {
     const result = validateUploadedFile({
       name: 'giant_video_archive.pdf',
-      size: 16 * 1024 * 1024, // 16 MB
+      size: 11 * 1024 * 1024, // 11 MB
       type: 'application/pdf',
     });
 
