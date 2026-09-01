@@ -186,6 +186,11 @@ Only return valid JSON.`;
       parsed = JSON.parse(cleanJson);
     }
 
+    // Safely handle cases where Groq wraps the single JSON object in an array
+    if (Array.isArray(parsed)) {
+      parsed = parsed[0];
+    }
+
     return MethodologyMatchSchema.parse(parsed);
   }
 
@@ -233,6 +238,11 @@ Only return valid JSON.`;
     } catch {
       const cleanJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
       parsed = JSON.parse(cleanJson);
+    }
+
+    // Safely handle cases where Groq wraps the single JSON object in an array
+    if (Array.isArray(parsed)) {
+      parsed = parsed[0];
     }
 
     return ReportGenerationSchema.parse(parsed);

@@ -5,7 +5,7 @@
 // ==============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { memoryStore } from '@/lib/db/memory-store';
+import { db } from '@/lib/db';
 import { validateUploadedFile } from '@/lib/storage/validator';
 import { logAuditEvent } from '@/lib/audit';
 import { DocumentRecord } from '@/lib/db/schema';
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     };
 
-    memoryStore.documents.set(docId, docRecord);
+    await db.createDocument(docRecord);
 
     await logAuditEvent({
       entityType: 'DOCUMENT',

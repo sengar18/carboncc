@@ -194,17 +194,35 @@ export async function POST(
     const hasPriorCredits = priorProjectFact ? priorProjectFact.value_raw.toLowerCase().includes('active') : false;
     const verifiedCount = facts.filter((f) => f.status === 'VERIFIED' || f.status === 'USER_PROVIDED').length;
 
+    // Check actual eligibility from methodology match
+    const isEligible = matchSummary ? (matchSummary.status === 'MATCH' || matchSummary.status === 'POTENTIAL_MATCH') : false;
+
+    // Check actual documentation presence from project documents or facts
+    const projectDocs = await db.getDocumentsByProjectId(project.id);
+    const docFact = facts.find((f) => {
+      const t = f.fact_type.toUpperCase();
+      return t.includes('BILL') || t.includes('LOG') || t.includes('METER') || t.includes('INVOICE') || t.includes('WEIGHBRIDGE') || t.includes('DISCOM');
+    });
+    const hasBillsOrLogs = projectDocs.length > 0 || !!docFact;
+
+    // Check actual commercial potential evidence from facts
+    const commFact = facts.find((f) => {
+      const t = f.fact_type.toUpperCase();
+      return t.includes('TARIFF') || t.includes('OFFTAKE') || t.includes('COMMERCIAL') || t.includes('PPA') || t.includes('REVENUE') || t.includes('SAVINGS');
+    });
+    const commercialPotentialEvidence = commFact ? `${commFact.fact_type}: ${commFact.value_raw}` : undefined;
+
     const scoreResult = opportunityScoreEngine.calculateScore({
       sector: project.sector,
-      isEligibleSector: true,
+      isEligibleSector: isEligible,
       feedstockOrScaleNumeric: scaleVal,
       feedstockUnit: 'MT/year',
       hasGridOrFossilBaseline: hasGrid,
       hasPriorCarbonProjects: hasPriorCredits,
       factsCount: facts.length,
       verifiedFactsCount: verifiedCount,
-      hasElectricityBillsOrLogs: true,
-      commercialPotentialEvidence: 'Captive power / clean energy generation offsets commercial retail grid tariff (~INR 7.50/kWh).',
+      hasElectricityBillsOrLogs: hasBillsOrLogs,
+      commercialPotentialEvidence,
     });
 
     // 6. Generate Preliminary Report with AI layer
