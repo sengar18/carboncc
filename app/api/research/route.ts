@@ -26,37 +26,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure Organization exists in DB with valid UUID
-    let existingOrg = orgId && isValidUUID(orgId) ? await db.getOrganizationById(orgId) : undefined;
-    if (!existingOrg) {
-      existingOrg = await db.createOrganization({
-        id: orgId && isValidUUID(orgId) ? orgId : generateUUID(),
-        name: companyName,
-        industry_sector: sector || 'Rice / Food Processing',
-        state,
-        website,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-    }
-    const currentOrgId = existingOrg.id;
+    let currentOrgId: string;
+    let currentProjectId: string;
 
-    // Ensure Project exists in DB with valid UUID
-    let existingProj = projectId && isValidUUID(projectId) ? await db.getProjectById(projectId) : undefined;
-    if (!existingProj) {
-      existingProj = await db.createProject({
-        id: projectId && isValidUUID(projectId) ? projectId : generateUUID(),
-        organization_id: currentOrgId,
-        title: `${companyName} Clean Energy & Bio-Residue Project`,
-        sector: sector || 'Rice / Food Processing',
-        location_state: state,
-        existing_carbon_credit_project: false,
-        pipeline_status: 'RESEARCHED',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+    try {
+      // Ensure Organization exists in DB with valid UUID
+      let existingOrg = orgId && isValidUUID(orgId) ? await db.getOrganizationById(orgId) : undefined;
+      if (!existingOrg) {
+        existingOrg = await db.createOrganization({
+          id: orgId && isValidUUID(orgId) ? orgId : generateUUID(),
+          name: companyName,
+          industry_sector: sector || 'Rice / Food Processing',
+          state,
+          website,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+      currentOrgId = existingOrg.id;
+
+      // Ensure Project exists in DB with valid UUID
+      let existingProj = projectId && isValidUUID(projectId) ? await db.getProjectById(projectId) : undefined;
+      if (!existingProj) {
+        existingProj = await db.createProject({
+          id: projectId && isValidUUID(projectId) ? projectId : generateUUID(),
+          organization_id: currentOrgId,
+          title: `${companyName} Clean Energy & Bio-Residue Project`,
+          sector: sector || 'Rice / Food Processing',
+          location_state: state,
+          existing_carbon_credit_project: false,
+          pipeline_status: 'RESEARCHED',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+      currentProjectId = existingProj.id;
+    } catch (err) {
+      console.error('Supabase Init Error:', err);
+      return NextResponse.json(
+        { error: 'Failed to initialize assessment', details: err instanceof Error ? err.message : 'Unknown DB error' },
+        { status: 500 }
+      );
     }
-    const currentProjectId = existingProj.id;
 
     await logAuditEvent({
       entityType: 'PROJECT',
@@ -67,25 +78,53 @@ export async function POST(req: NextRequest) {
 
     // Run Research Layer
     const researchProvider = getResearchProvider();
-    const researchResult = await researchProvider.researchCompany(companyName, website, state);
+    let researchResult: any = null;
+    
+    try {
+      researchResult = await researchProvider.researchCompany(companyName, website, state);
+    } catch (err) {
+      console.warn('Primary research failed, falling back to DeepSeek deterministic prompt:', err);
+      const aiProvider = getAIProvider(customProvider, customApiKey);
+      if (aiProvider.extractResearchFacts) {
+        const extracted = await aiProvider.extractResearchFacts(companyName, sector, state);
+        researchResult = {
+          companyName,
+          sources: [],
+          extractedFacts: extracted,
+          summary: `Web research bypassed due to scraper failure. Generated ${extracted.length} estimated facts via LLM domain knowledge.`,
+          dataGaps: [],
+        };
+      } else {
+        // Ultimate fallback if mock AI provider is used
+        researchResult = {
+          companyName,
+          sources: [],
+          extractedFacts: [],
+          summary: 'Research bypassed (Fallback).',
+          dataGaps: [],
+        };
+      }
+    }
 
     // Save Research Sources
     const createdSources: ResearchSource[] = [];
-    for (const src of researchResult.sources) {
-      const sourceId = generateUUID();
-      const sourceRecord: ResearchSource = {
-        id: sourceId,
-        project_id: currentProjectId,
-        url: src.url,
-        title: src.title,
-        source_type: 'WEB_PAGE',
-        raw_content: src.content,
-        content_hash: src.contentHash,
-        retrieved_at: src.retrievedAt,
-        created_at: new Date().toISOString(),
-      };
-      await db.createSource(sourceRecord);
-      createdSources.push(sourceRecord);
+    if (researchResult.sources) {
+      for (const src of researchResult.sources) {
+        const sourceId = generateUUID();
+        const sourceRecord: ResearchSource = {
+          id: sourceId,
+          project_id: currentProjectId,
+          url: src.url,
+          title: src.title,
+          source_type: 'WEB_PAGE',
+          raw_content: src.content,
+          content_hash: src.contentHash,
+          retrieved_at: src.retrievedAt,
+          created_at: new Date().toISOString(),
+        };
+        await db.createSource(sourceRecord);
+        createdSources.push(sourceRecord);
+      }
     }
 
     // Save Extracted Facts with strict provenance
@@ -137,7 +176,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Research API error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal research error' },
+      { error: 'Internal research error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

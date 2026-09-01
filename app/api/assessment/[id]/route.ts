@@ -297,7 +297,7 @@ export async function POST(
   } catch (error) {
     console.error('Execute assessment error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to execute assessment' },
+      { error: 'Failed to execute assessment', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

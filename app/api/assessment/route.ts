@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Create assessment error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create assessment' },
+      { error: 'Failed to create assessment', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

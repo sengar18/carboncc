@@ -92,4 +92,5 @@ export interface IAIProvider {
     facts: Fact[];
     matchResult: MethodologyMatchResult;
   }): Promise<ReportGenerationResult>;
+  extractResearchFacts?(companyName: string, sector: string, state: string): Promise<any>;
 }

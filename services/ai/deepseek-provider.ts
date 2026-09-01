@@ -106,6 +106,17 @@ Only return valid JSON.`;
     return [];
   }
 
+  async extractResearchFacts(companyName: string, sector: string, state: string): Promise<any> {
+    const systemPrompt = `You are an Indian CCTS domain expert. Based on the provided company name, sector, and state, return a JSON array of extracted facts. Use your domain knowledge to estimate capacities or typical configurations if public data is known. Format: { "extractedFacts": [ { "factType": string, "valueRaw": string, "valueNumeric": number, "unit": string, "status": "ESTIMATED", "confidence": number, "sourceCitation": string, "sourceUrl": string } ] }`;
+    const userPrompt = `Company: ${companyName}\nSector: ${sector}\nState: ${state}`;
+    const raw = await this.callDeepSeek(systemPrompt, userPrompt, true);
+    const parsed = this.parseJsonSafely<any>(raw);
+    if (parsed.extractedFacts && Array.isArray(parsed.extractedFacts)) {
+      return parsed.extractedFacts;
+    }
+    return [];
+  }
+
   async identifyDataGaps(facts: Fact[], sector: string): Promise<DataGapQuestion[]> {
     const systemPrompt = `You are an Indian Carbon Credit Trading Scheme (CCTS) Technical Auditor.
 Given a project sector and known project facts, identify missing operational/technical parameters required for official CCTS baseline and additionality calculations.

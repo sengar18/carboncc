@@ -130,8 +130,8 @@ export default function AssessmentWizardPage() {
       setResearchStage('2. Extracting Structured Facts & Citations via AI...');
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Research execution failed');
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.details || data.error || 'Research execution failed');
       }
 
       const data = await res.json();
@@ -173,7 +173,8 @@ export default function AssessmentWizardPage() {
       });
 
       if (!asmtRes.ok) {
-        throw new Error('Failed to initialize assessment');
+        const errData = await asmtRes.json().catch(() => ({}));
+        throw new Error(errData.details || errData.error || 'Failed to initialize assessment');
       }
 
       const asmtData = await asmtRes.json();
@@ -208,8 +209,8 @@ export default function AssessmentWizardPage() {
       setResearchStage('2. Executing Deterministic Calculation Engine...');
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to complete assessment');
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.details || data.error || 'Failed to complete assessment');
       }
 
       const data = await res.json();
