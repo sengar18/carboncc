@@ -22,18 +22,23 @@ export class CalculationEngine {
     }
 
     const energyInput = inputs.find(
-      (i) =>
-        i.key === 'NET_ELECTRICITY_DELIVERED_MWH' ||
-        i.key === 'NET_ELECTRICITY_GENERATION_MWH' ||
-        i.key === 'ANNUAL_GRID_ELECTRICITY_MWH' ||
-        i.key === 'GENERATION_MWH' ||
-        i.key === 'NET_EXPORT_MWH'
+      (i) => {
+        const k = i.key.toUpperCase();
+        return k === 'NET_ELECTRICITY_DELIVERED_MWH' ||
+        k === 'NET_ELECTRICITY_GENERATION_MWH' ||
+        k === 'ANNUAL_GRID_ELECTRICITY_MWH' ||
+        k === 'GENERATION_MWH' ||
+        k === 'NET_EXPORT_MWH' ||
+        k === 'ANNUAL_ELECTRICITY_GENERATION_MWH';
+      }
     );
     const gridEfInput = inputs.find(
-      (i) =>
-        i.key === 'GRID_EMISSION_FACTOR_EF_GRID_TCO2_MWH' ||
-        i.key === 'GRID_EMISSION_FACTOR_TCO2_MWH' ||
-        i.key === 'EF_GRID'
+      (i) => {
+        const k = i.key.toUpperCase();
+        return k === 'GRID_EMISSION_FACTOR_EF_GRID_TCO2_MWH' ||
+        k === 'GRID_EMISSION_FACTOR_TCO2_MWH' ||
+        k === 'EF_GRID'
+      }
     );
     const projectEmissionsInput = inputs.find(
       (i) => i.key === 'PROJECT_EMISSIONS_PE_TCO2' || i.key === 'PROJECT_EMISSIONS'
@@ -491,16 +496,22 @@ export class CalculationEngine {
     }
 
     const energyInput = inputs.find(
-      (i) =>
-        i.key === 'NET_ELECTRICITY_GENERATION_MWH' ||
-        i.key === 'NET_ELECTRICITY_DELIVERED_MWH' ||
-        i.key === 'GENERATION_MWH'
+      (i) => {
+        const k = i.key.toUpperCase();
+        return k === 'NET_ELECTRICITY_GENERATION_MWH' ||
+        k === 'NET_ELECTRICITY_DELIVERED_MWH' ||
+        k === 'GENERATION_MWH' ||
+        k === 'ANNUAL_ELECTRICITY_GENERATION_MWH' ||
+        k === 'ANNUAL_GRID_ELECTRICITY_MWH'
+      }
     );
     const gridEfInput = inputs.find(
-      (i) =>
-        i.key === 'GRID_EMISSION_FACTOR_EF_GRID_TCO2_MWH' ||
-        i.key === 'GRID_EMISSION_FACTOR_TCO2_MWH' ||
-        i.key === 'EF_GRID'
+      (i) => {
+        const k = i.key.toUpperCase();
+        return k === 'GRID_EMISSION_FACTOR_EF_GRID_TCO2_MWH' ||
+        k === 'GRID_EMISSION_FACTOR_TCO2_MWH' ||
+        k === 'EF_GRID'
+      }
     );
 
     const citations: CalculationProvenanceCitation[] = [

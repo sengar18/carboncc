@@ -61,10 +61,16 @@ export class DeepSeekAIProvider implements IAIProvider {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`[DeepSeek] API Error ${response.status}:`, errorText);
       throw new Error(`DeepSeek API error (${response.status}): ${errorText}`);
     }
 
     const result = await response.json();
+    
+    // Log token usage
+    const usage = result.usage;
+    console.log(`[DeepSeek] Success. Tokens used - Prompt: ${usage?.prompt_tokens || 0}, Completion: ${usage?.completion_tokens || 0}, Total: ${usage?.total_tokens || 0}`);
+
     const content = result.choices?.[0]?.message?.content;
     if (!content) {
       throw new Error('DeepSeek API returned an empty or malformed completion response.');
@@ -118,7 +124,8 @@ Only return valid JSON.`;
     const parsed = this.parseJsonSafely<any>(raw);
     if (Array.isArray(parsed)) return parsed;
     if (parsed.questions && Array.isArray(parsed.questions)) return parsed.questions;
-    return [];
+    if (parsed.dataGaps && Array.isArray(parsed.dataGaps)) return parsed.dataGaps;
+    throw new Error('DeepSeek failed to return a valid array of data gaps.');
   }
 
   async matchMethodology(

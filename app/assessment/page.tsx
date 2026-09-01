@@ -81,14 +81,7 @@ export default function AssessmentWizardPage() {
   const [sources, setSources] = useState<ResearchSource[]>([]);
   const [facts, setFacts] = useState<Fact[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({
-    ANNUAL_BIOMASS_RESIDUE_MT: '6200',
-    GRID_CONNECTED_OR_CAPTIVE: 'Yes - Grid Connected',
-    PREEXISTING_CARBON_PROJECT: 'No existing carbon project',
-    ANNUAL_GRID_ELECTRICITY_MWH: '2400',
-    BIOMASS_FEEDSTOCK_QUANTITY_MT: '6200',
-    NET_ELECTRICITY_GENERATION_MWH: '2400',
-  });
+  const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({});
 
   // Final Assessment Report
   const [completedAssessment, setCompletedAssessment] = useState<Assessment | null>(null);
@@ -1091,6 +1084,17 @@ export default function AssessmentWizardPage() {
                   onClick={() => {
                     setCurrentStep(1);
                     setCompletedAssessment(null);
+                    setProjectId(null);
+                    setOrgId(null);
+                    setAssessmentId(null);
+                    setResearchSummary('');
+                    setSources([]);
+                    setFacts([]);
+                    setQuestions([]);
+                    setQuestionAnswers({});
+                    setCalculationRun(null);
+                    setReport(null);
+                    setPathwayScreening(null);
                   }}
                   className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition"
                 >
