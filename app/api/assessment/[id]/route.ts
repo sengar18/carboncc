@@ -180,7 +180,8 @@ export async function POST(
       assumptions_log: calcResult.assumptions,
       calculation_explanation: calcResult.explanation,
       is_synthetic: calcResult.isSynthetic,
-      executed_at: new Date().toISOString(),
+      executed_at: calcResult.executedAt,
+      provenance_citations: calcResult.provenanceCitations,
     };
     await db.createCalculationRun(runRecord);
 

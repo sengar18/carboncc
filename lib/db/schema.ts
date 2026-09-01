@@ -230,6 +230,7 @@ export interface CalculationRun {
   calculation_explanation?: string;
   is_synthetic: boolean;
   executed_at: string;
+  provenance_citations?: any[];
 }
 
 export interface Contact {

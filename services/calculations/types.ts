@@ -9,10 +9,12 @@ export type CalculationStatus = 'SUCCESS' | 'INSUFFICIENT_DATA' | 'CALCULATION_U
 export interface CalculationProvenanceCitation {
   documentCode: string;
   documentTitle: string;
-  equationNumber: string;
-  section: string;
-  page: number;
+  equationNumber?: string;
+  section?: string;
+  page?: number;
   issuingAuthority: string;
+  sourceUrl?: string;
+  sourceHash?: string;
 }
 
 export interface CalculationInputParam {

@@ -6,6 +6,7 @@
 
 import { CalculationInputParam, CalculationResult, CalculationProvenanceCitation } from './types';
 import { UnitConverter } from './unit-converter';
+import { CEA_GRID_EMISSION_FACTORS_V20, MNRE_GREEN_HYDROGEN_STANDARD } from '@/lib/data/reference-coefficients';
 
 export class CalculationEngine {
   /**
@@ -52,6 +53,13 @@ export class CalculationEngine {
         page: 18,
         issuingAuthority: 'Bureau of Energy Efficiency (BEE), Ministry of Power, Government of India',
       },
+      {
+        documentCode: 'CEA_V20',
+        documentTitle: CEA_GRID_EMISSION_FACTORS_V20.databaseTitle,
+        issuingAuthority: 'Central Electricity Authority',
+        sourceUrl: CEA_GRID_EMISSION_FACTORS_V20.sourceUrl,
+        sourceHash: CEA_GRID_EMISSION_FACTORS_V20.sourceHash,
+      },
     ];
 
     if (missing.length > 0) {
@@ -97,8 +105,8 @@ export class CalculationEngine {
 
     const normalizedEnergyMWh = UnitConverter.normalizeEnergyToMWh(rawEnergyNum, energyInput!.unit);
 
-    // Grid Emission Factor from CEA Database (Default Indian National Grid Baseline: 0.716 tCO2/MWh)
-    let gridEf = 0.716;
+    // Grid Emission Factor from CEA Database (Default Indian National Grid Baseline: 0.757 tCO2/MWh)
+    let gridEf = CEA_GRID_EMISSION_FACTORS_V20.combinedMarginSolarWind.value;
     if (gridEfInput && gridEfInput.valueRaw !== undefined && gridEfInput.valueRaw !== null) {
       const parsedEf = typeof gridEfInput.valueRaw === 'number'
         ? gridEfInput.valueRaw
@@ -133,7 +141,7 @@ export class CalculationEngine {
 1. Source: Bureau of Energy Efficiency, BM EN01.001, Ver 1.0 (27 March 2025)
 2. Equation (11): BE_y = EG_PJ,y * EF_grid,CM,y
    - Net Electricity Generation: ${normalizedEnergyMWh.toLocaleString()} MWh/yr
-   - CEA Grid Emission Factor: ${gridEf} tCO2/MWh
+   - CEA Grid Emission Factor: ${gridEf} tCO2/MWh (${CEA_GRID_EMISSION_FACTORS_V20.combinedMarginSolarWind.sourceCitation})
    -> Gross Baseline Emissions: ${baselineEmissions.toLocaleString()} tCO2/yr
 3. Equation (17): ER_y = BE_y - PE_y
    - Project Emissions: ${projectEmissions.toFixed(2)} tCO2/yr
@@ -200,6 +208,13 @@ export class CalculationEngine {
         page: 7,
         issuingAuthority: 'Bureau of Energy Efficiency (BEE), Ministry of Power, Government of India',
       },
+      {
+        documentCode: 'MNRE_GH24',
+        documentTitle: MNRE_GREEN_HYDROGEN_STANDARD.standardTitle,
+        issuingAuthority: 'Ministry of New and Renewable Energy (MNRE)',
+        sourceUrl: MNRE_GREEN_HYDROGEN_STANDARD.sourceUrl,
+        sourceHash: MNRE_GREEN_HYDROGEN_STANDARD.sourceHash,
+      }
     ];
 
     if (!h2Input || h2Input.valueRaw === undefined || h2Input.valueRaw === null || h2Input.valueRaw === '') {
@@ -245,8 +260,8 @@ export class CalculationEngine {
 
     const normalizedH2MT = UnitConverter.normalizeMassToMT(rawH2Num, h2Input.unit);
 
-    // Default IEA 2023 / CCTS Section 4.3 Paragraph 22(a)(ii) baseline emission factor = 9.0 tCO2e/tH2 for SMR natural gas
-    let baselineEf = 9.0;
+    // Default IEA 2023 / CCTS Section 4.3 Paragraph 22(a)(ii) baseline emission factor = MNRE SMRT Grey Baseline (9.0 tCO2e/tH2) for SMR natural gas
+    let baselineEf = MNRE_GREEN_HYDROGEN_STANDARD.smrtGreyBaseline_kgCO2ePerKgH2_min;
     if (baselineEfInput && baselineEfInput.valueRaw !== undefined && baselineEfInput.valueRaw !== null) {
       const parsedEf = typeof baselineEfInput.valueRaw === 'number'
         ? baselineEfInput.valueRaw
@@ -271,7 +286,7 @@ export class CalculationEngine {
 1. Source: Bureau of Energy Efficiency, BM EN01.002, Ver 1.0 (27 March 2025)
 2. Equation (1): BE_y = M_H2,PJ,y * EF_H2,BL
    - Pure Green H2 Supplied: ${normalizedH2MT.toLocaleString()} MT/yr
-   - Baseline SMR Emission Factor: ${baselineEf} tCO2e/tH2 (IEA 2023 / CCTS Section 4.3, Paragraph 22(a)(ii))
+   - Baseline SMR Emission Factor: ${baselineEf} tCO2e/tH2 (MNRE Green Hydrogen Standard)
    -> Gross Baseline Displaced: ${baselineEmissions.toLocaleString()} tCO2e/yr
 3. Equation (9): ER_y = BE_y - PE_y - LE_y
    - Project Emissions: 0.00 tCO2e/yr (100% Captive RE electrolyser)
@@ -497,6 +512,13 @@ export class CalculationEngine {
         page: 15,
         issuingAuthority: 'Bureau of Energy Efficiency (BEE), Ministry of Power, Government of India',
       },
+      {
+        documentCode: 'CEA_V20',
+        documentTitle: CEA_GRID_EMISSION_FACTORS_V20.databaseTitle,
+        issuingAuthority: 'Central Electricity Authority',
+        sourceUrl: CEA_GRID_EMISSION_FACTORS_V20.sourceUrl,
+        sourceHash: CEA_GRID_EMISSION_FACTORS_V20.sourceHash,
+      },
     ];
 
     // BM EN01.003 is a 96-page comprehensive methodology covering Scenarios 1-14.
@@ -545,7 +567,7 @@ export class CalculationEngine {
     }
 
     const normalizedEnergyMWh = UnitConverter.normalizeEnergyToMWh(rawNum, energyInput.unit);
-    let gridEf = 0.716;
+    let gridEf = CEA_GRID_EMISSION_FACTORS_V20.combinedMarginSolarWind.value;
     if (gridEfInput && gridEfInput.valueRaw !== undefined && gridEfInput.valueRaw !== null) {
       const parsedEf = typeof gridEfInput.valueRaw === 'number'
         ? gridEfInput.valueRaw
