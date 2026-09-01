@@ -105,6 +105,15 @@ export default function AssessmentWizardPage() {
     setIsAuditModalOpen(true);
   };
 
+  const getAuthHeaders = () => {
+    const provider = localStorage.getItem('cs_llm_provider');
+    const apiKey = localStorage.getItem('cs_llm_api_key');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (provider) headers['x-llm-provider'] = provider;
+    if (apiKey) headers['x-custom-api-key'] = apiKey;
+    return headers;
+  };
+
   // Step 3: Trigger Real Research
   const handleRunResearch = async () => {
     setIsLoading(true);
@@ -114,7 +123,7 @@ export default function AssessmentWizardPage() {
     try {
       const res = await fetch('/api/research', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           companyName: businessName,
           website,
@@ -143,7 +152,7 @@ export default function AssessmentWizardPage() {
 
       const asmtRes = await fetch('/api/assessment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           projectId: data.projectId,
           sector,
@@ -197,7 +206,7 @@ export default function AssessmentWizardPage() {
     try {
       const res = await fetch(`/api/assessment/${assessmentId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           answers: questionAnswers,
         }),

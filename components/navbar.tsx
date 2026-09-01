@@ -5,6 +5,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Leaf, ShieldCheck, Compass, LayoutDashboard, Cpu } from 'lucide-react';
+import { NavbarSettingsTrigger } from './navbar-settings-trigger';
 
 export function Navbar() {
   return (
@@ -51,6 +52,8 @@ export function Navbar() {
             <Cpu className="w-3.5 h-3.5 text-emerald-600" />
             <span>Mock Mode: Zero-Credit</span>
           </div>
+
+          <NavbarSettingsTrigger />
 
           <Link
             href="/assessment"

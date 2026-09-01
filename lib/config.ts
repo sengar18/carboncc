@@ -5,7 +5,7 @@
 export interface AppConfig {
   nodeEnv: string;
   mockMode: boolean;
-  aiProvider: 'mock' | 'gemini' | 'openai' | 'groq';
+  aiProvider: 'mock' | 'gemini' | 'openai' | 'groq' | 'deepseek';
   researchProvider: 'mock' | 'firecrawl';
   databaseProvider: 'mock_memory' | 'supabase';
   supabaseUrl?: string;
@@ -14,6 +14,7 @@ export interface AppConfig {
   geminiApiKey?: string;
   groqApiKey?: string;
   openaiApiKey?: string;
+  deepseekApiKey?: string;
   firecrawlApiKey?: string;
   maxUploadSizeBytes: number;
   allowedFileTypes: string[];
@@ -23,7 +24,7 @@ export interface AppConfig {
 export const config: AppConfig = {
   nodeEnv: process.env.NODE_ENV || 'development',
   mockMode: process.env.NODE_ENV === 'production' ? false : process.env.NEXT_PUBLIC_MOCK_MODE === 'true',
-  aiProvider: (process.env.AI_PROVIDER as any) || 'mock',
+  aiProvider: (process.env.AI_PROVIDER as AppConfig['aiProvider']) || 'deepseek',
   researchProvider: (process.env.RESEARCH_PROVIDER as any) || 'mock',
   databaseProvider: (process.env.DATABASE_PROVIDER as any) || 'mock_memory',
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -32,6 +33,7 @@ export const config: AppConfig = {
   geminiApiKey: process.env.GEMINI_API_KEY,
   groqApiKey: process.env.GROQ_API_KEY,
   openaiApiKey: process.env.OPENAI_API_KEY,
+  deepseekApiKey: process.env.DEEPSEEK_API_KEY,
   firecrawlApiKey: process.env.FIRECRAWL_API_KEY,
   maxUploadSizeBytes: parseInt(process.env.MAX_UPLOAD_SIZE_BYTES || '10485760', 10), // 10MB hard cap
   allowedFileTypes: (

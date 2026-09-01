@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getAIProvider } from '@/services/ai';
+import { getAIProvider, AIProviderName } from '@/services/ai';
 import { methodologyMatcher } from '@/services/methodology/matcher';
 import { logAuditEvent } from '@/lib/audit';
 import { Assessment, Question } from '@/lib/db/schema';
@@ -32,6 +32,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { projectId, sector, userProvidedFacts } = body;
+
+    // BYOK: optional per-request provider and API key from client headers
+    const customProvider = (req.headers.get('x-llm-provider') || body.provider) as AIProviderName | undefined;
+    const customApiKey = req.headers.get('x-custom-api-key') || body.apiKey || undefined;
 
     if (!projectId || !isValidUUID(projectId)) {
       return NextResponse.json({ error: 'Valid projectId is required.' }, { status: 400 });
@@ -64,7 +68,7 @@ export async function POST(req: NextRequest) {
     }
 
     const facts = await db.getFactsByProjectId(projectId);
-    const aiProvider = getAIProvider();
+    const aiProvider = getAIProvider(customProvider, customApiKey);
 
     // 1. Identify Data Gaps
     const dataGaps = await aiProvider.identifyDataGaps(facts, project.sector);

@@ -8,7 +8,7 @@ import { methodologyMatcher } from '@/services/methodology/matcher';
 import { calculationEngine, CalculationResult } from '@/services/calculations/engine';
 import { opportunityScoreEngine } from '@/services/scoring/engine';
 import { EnvironmentalPathwayScreener } from '@/services/methodology/pathway-screener';
-import { getAIProvider } from '@/services/ai';
+import { getAIProvider, AIProviderName } from '@/services/ai';
 import { logAuditEvent } from '@/lib/audit';
 import { CalculationRun, Fact } from '@/lib/db/schema';
 import { isValidUUID, generateUUID } from '@/lib/utils';
@@ -63,6 +63,10 @@ export async function POST(
     }
     const body = await req.json();
     const { answers } = body; // Map of question_key -> user_response
+
+    // BYOK: optional per-request provider and API key from client headers
+    const customProvider = (req.headers.get('x-llm-provider') || body.provider) as AIProviderName | undefined;
+    const customApiKey = req.headers.get('x-custom-api-key') || body.apiKey || undefined;
 
     const assessment = await db.getAssessmentById(id);
     if (!assessment) {
@@ -233,7 +237,7 @@ export async function POST(
     });
 
     // 6. Generate Preliminary Report with AI layer
-    const aiProvider = getAIProvider();
+    const aiProvider = getAIProvider(customProvider, customApiKey);
     const aiMatchResult = await aiProvider.matchMethodology(facts, db.getMethodologies());
     const report = await aiProvider.generatePreliminaryReport({
       projectName: project.title,

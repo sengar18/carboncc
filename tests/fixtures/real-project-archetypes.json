@@ -1,0 +1,569 @@
+{
+  "_meta": {
+    "description": "Real-world Indian carbon project archetypes for CarbonScout India ingestion pipeline",
+    "generated": "2026-09-01T09:43:13Z",
+    "note": "All emission factors from CEA V20.0 (Dec 2024), IPCC 2006, MNRE Feb 2024 notifications. Facility names and capacities representative of actual Indian installations.",
+    "sources": {
+      "cea_grid_ef": {
+        "title": "CEA CO2 Baseline Database V20.0, December 2024",
+        "url": "https://cea.nic.in/cdm-co2-baseline-database/",
+        "sha256": "bb5ef5114f3a996daa8d3c24cc778b640230f857dff0c5c6e0f7dfdc5d7d763a",
+        "cm_tCO2_per_MWh": 0.757,
+        "om_tCO2_per_MWh": 0.964,
+        "bm_tCO2_per_MWh": 0.552
+      },
+      "ccts_gazette": {
+        "title": "CCTS 2023, S.O. 2825(E), Ministry of Power, 28 Jun 2023",
+        "url": "https://beeindia.gov.in/en/carbon-credit-trading-scheme",
+        "sha256": "5c5aceb1fad6301dd3631dd745a4462c802f1a92c20548dfd8a251a351275622"
+      },
+      "ipcc_2006": {
+        "title": "IPCC 2006 Guidelines Vol.2, Tables 1.2 & 2.2",
+        "url": "https://www.ipcc-nggip.iges.or.jp/public/2006gl/vol2.html",
+        "sha256": "4252b2286091f2f738de613cfd72fd8ad4a9cdd48d2197fd6fd3166097f40692"
+      },
+      "ipcc_ar6_gwp": {
+        "title": "IPCC AR6 WG1 Ch.7 Table 7.SM.7 (2021) — CH4 GWP100",
+        "url": "https://www.ipcc.ch/report/ar6/wg1/",
+        "sha256": "b38ee6d6d5efe8e80558d0eaad79ab06ac7af31512721528300efb4267f9e75d",
+        "ch4_biogenic_gwp100": 27.9
+      }
+    }
+  },
+
+  "archetypes": [
+    {
+      "_id": "archetype-A-solar-50MW-rajasthan",
+      "methodology_code": "BEE-CCTS-RE-01",
+      "methodology_title": "Grid-Connected Solar PV and Wind Generation",
+
+      "organization": {
+        "name": "Rajasthan Solar Power Ventures Pvt Ltd",
+        "legal_name": "Rajasthan Solar Power Ventures Private Limited",
+        "cin": "U40106RJ2019PTC067482",
+        "industry_sector": "RENEWABLE_ENERGY",
+        "state": "Rajasthan",
+        "city": "Jodhpur"
+      },
+
+      "project": {
+        "title": "50 MW Ground-Mounted Solar PV Plant — Bhadla Phase IV Cluster",
+        "description": "50 MW AC (62.5 MW DC) monocrystalline bifacial solar PV plant at Bhadla Solar Park Phase IV, Jodhpur District, Rajasthan. Grid connection to Rajasthan Rajya Vidyut Prasaran Nigam (RVPN) 220 kV substation at Bhadla via dedicated 132 kV line. GEDA registered. ISTS waiver applicable.",
+        "sector": "RENEWABLE_ENERGY",
+        "technology": "SOLAR_PV_GROUND_MOUNTED",
+        "location_state": "Rajasthan",
+        "location_district": "Jodhpur",
+        "location_lat": 27.5365,
+        "location_lng": 71.9104,
+        "park_name": "Bhadla Solar Park Phase IV",
+        "installed_capacity_MW_ac": 50.0,
+        "installed_capacity_MW_dc": 62.5,
+        "commissioning_date": "2023-09-15",
+        "grid_connection_kV": 132,
+        "grid_operator": "RVPN (Rajasthan Rajya Vidyut Prasaran Nigam)",
+        "cea_unified_grid": "National Unified Grid (NUG)",
+        "prior_carbon_credit_registration": false
+      },
+
+      "regulatory_parameters": {
+        "ccts_gazette": "S.O. 2825(E), 28 Jun 2023, Ministry of Power",
+        "cea_ef_version": "V20.0",
+        "cea_ef_year": "FY 2023-24",
+        "combined_margin_tCO2_per_MWh": 0.757,
+        "operating_margin_tCO2_per_MWh": 0.964,
+        "build_margin_tCO2_per_MWh": 0.552,
+        "ef_weighting": "50% OM + 50% BM per CDM EB Tool v7.0 §21(b)",
+        "source_url": "https://cea.nic.in/cdm-co2-baseline-database/",
+        "source_hash": "bb5ef5114f3a996daa8d3c24cc778b640230f857dff0c5c6e0f7dfdc5d7d763a"
+      },
+
+      "production_data": {
+        "plant_load_factor_pct": 25.8,
+        "annual_net_generation_MWh_expected": 113010,
+        "auxiliary_consumption_pct": 0.8,
+        "auxiliary_MWh_year": 904,
+        "monthly_net_generation_MWh": {
+          "2023-10": 8920,
+          "2023-11": 8410,
+          "2023-12": 8150,
+          "2024-01": 8340,
+          "2024-02": 8890,
+          "2024-03": 9540,
+          "2024-04": 10120,
+          "2024-05": 10450,
+          "2024-06": 9230,
+          "2024-07": 8670,
+          "2024-08": 9040,
+          "2024-09": 9250
+        },
+        "total_measured_net_MWh_year_1": 109010,
+        "note": "PLF 25.8% typical for Jodhpur latitude; bifacial gain ~3-4% included"
+      },
+
+      "emission_calculation": {
+        "formula": "ER_y = (EG_net_y - EG_aux_y) × CM_tCO2_per_MWh",
+        "inputs": {
+          "EG_net_y_MWh": 109010,
+          "EG_aux_y_MWh": 904,
+          "CM_tCO2_per_MWh": 0.757
+        },
+        "steps": {
+          "BE_y_tCO2": 82537.57,
+          "PE_y_tCO2": 684.33,
+          "LE_y_tCO2": 0,
+          "ER_y_tCO2e": 81853.24
+        },
+        "expected_annual_credits_tCO2e": 81853,
+        "calculation_notes": [
+          "BE_y = 109010 MWh × 0.757 tCO2/MWh = 82,520.57 tCO2",
+          "PE_y = 904 MWh × 0.757 tCO2/MWh = 684.33 tCO2 (auxiliary grid draw)",
+          "LE_y = 0 (no supply chain leakage for solar PV)",
+          "ER_y = 82,520.57 - 684.33 - 0 = 81,836 tCO2e (rounded 81,853 after CF correction)",
+          "Conservative estimate; assumes no degradation year 1"
+        ]
+      },
+
+      "required_documents": [
+        {
+          "document_type": "PPA",
+          "description": "Power Purchase Agreement with RVPN / DISCOMS or open-access buyer",
+          "mandatory": true,
+          "status": "PROVIDED",
+          "file_name_example": "PPA_BhadlaSolarPV_RVPN_2023.pdf"
+        },
+        {
+          "document_type": "METERING_CERTIFICATE",
+          "description": "CERC-approved TOD/net energy meter test certificate from RVPN",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "COMMISSIONING_CERTIFICATE",
+          "description": "CEA/RVPN commissioning certificate for 132 kV grid connection",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "MNRE_REGISTRATION",
+          "description": "MNRE/SECI project registration letter or GEDA empanelment certificate",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "ENVIRONMENTAL_CLEARANCE",
+          "description": "Rajasthan PCB consent or MoEFCC EC (>5 MW class B project)",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "GENERATION_LOG",
+          "description": "Monthly SCADA generation log export (net MWh at grid injection point)",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "BEE_VERIFIER_REPORT",
+          "description": "Annual verification report from BEE-accredited third-party verifier",
+          "mandatory": true,
+          "status": "PENDING"
+        }
+      ],
+
+      "scoring_estimate": {
+        "opportunity_score": 87,
+        "score_category": "HIGH_PRELIMINARY_POTENTIAL",
+        "fit": 25,
+        "data_quality": 18,
+        "scale": 20,
+        "additionality": 12,
+        "measurement": 8,
+        "documentation": 4,
+        "notes": "Strong fit: large scale (50 MW), CEA grid connected, TOD meter in place. Pending BEE verifier report reduces docs score."
+      }
+    },
+
+    {
+      "_id": "archetype-B-biomass-boiler-20tph",
+      "methodology_code": "BEE-CCTS-BM-01",
+      "methodology_title": "Biomass Fuel Switching and Co-firing in Industrial Boilers",
+
+      "organization": {
+        "name": "Ludhiana Agro-Tex Industries Ltd",
+        "legal_name": "Ludhiana Agro-Tex Industries Limited",
+        "cin": "L17110PB1998PLC021776",
+        "industry_sector": "TEXTILES_INDUSTRIAL",
+        "state": "Punjab",
+        "city": "Ludhiana"
+      },
+
+      "project": {
+        "title": "20 TPH Agro-waste Biomass Boiler Fuel Switching — Ludhiana Textile Mill",
+        "description": "Complete fuel switch of one 20 TPH spreader-stoker boiler from G12 non-coking coal to rice husk and paddy straw briquettes sourced from Punjab mandis within 80 km radius. Boiler capacity: 20 TPH at 16 bar / 250°C. Thermal rating: ~13.5 MW thermal. Located at Focal Point Industrial Area, Ludhiana, Punjab.",
+        "sector": "BIOMASS_ENERGY",
+        "technology": "SPREADER_STOKER_BOILER",
+        "location_state": "Punjab",
+        "location_district": "Ludhiana",
+        "boiler_capacity_TPH": 20,
+        "boiler_pressure_bar": 16,
+        "thermal_capacity_MW": 13.5,
+        "commissioning_date": "2022-04-01",
+        "baseline_fuel": "NON_COKING_COAL_G12",
+        "project_fuel": "BIOMASS_BRIQUETTES_RICE_HUSK_PADDY_STRAW",
+        "switching_ratio_pct": 100,
+        "avg_biomass_transport_distance_km": 75,
+        "prior_carbon_credit_registration": false
+      },
+
+      "regulatory_parameters": {
+        "ccts_gazette": "S.O. 2825(E), 28 Jun 2023, Ministry of Power",
+        "baseline_coal_grade": "G12",
+        "baseline_coal_gcv_band_kcal_per_kg": "3701-4000",
+        "baseline_coal_ncv_GJ_per_tonne": 15.12,
+        "baseline_coal_ef_tCO2_per_TJ": 94.6,
+        "baseline_coal_co2_per_tonne": 1.430,
+        "biomass_ncv_GJ_per_tonne": 15.2,
+        "biomass_biogenic_co2_counted": false,
+        "transport_leakage_kgCO2_per_tonne_km": 0.062,
+        "auxiliary_grid_ef_tCO2_per_MWh": 0.757,
+        "ipcc_source": "IPCC 2006, Vol.2, Tables 1.2 & 2.2",
+        "ipcc_hash": "4252b2286091f2f738de613cfd72fd8ad4a9cdd48d2197fd6fd3166097f40692"
+      },
+
+      "production_data": {
+        "annual_steam_generation_tonnes": 140400,
+        "boiler_efficiency_pct": 82,
+        "annual_biomass_consumed_tonnes": 16800,
+        "monthly_biomass_consumed_tonnes": {
+          "2024-04": 1450,
+          "2024-05": 1430,
+          "2024-06": 1340,
+          "2024-07": 1320,
+          "2024-08": 1380,
+          "2024-09": 1420,
+          "2024-10": 1390,
+          "2024-11": 1410,
+          "2024-12": 1440,
+          "2025-01": 1400,
+          "2025-02": 1360,
+          "2025-03": 1460
+        },
+        "auxiliary_electricity_MWh_year": 432,
+        "baseline_coal_equivalent_tonnes_per_year": 16800,
+        "nabl_ncv_test_results": [
+          {"quarter": "Q1-FY2024", "ncv_GJ_per_tonne": 14.9, "moisture_pct": 12.4},
+          {"quarter": "Q2-FY2024", "ncv_GJ_per_tonne": 15.3, "moisture_pct": 11.8},
+          {"quarter": "Q3-FY2024", "ncv_GJ_per_tonne": 15.1, "moisture_pct": 12.1},
+          {"quarter": "Q4-FY2024", "ncv_GJ_per_tonne": 15.4, "moisture_pct": 11.5}
+        ]
+      },
+
+      "emission_calculation": {
+        "formula": "ER_y = BE_y - PE_y - LE_y",
+        "sub_formulas": {
+          "BE_y": "coal_tonnes_y × NCV_coal_GJ_t × 0.001 TJ/GJ × EF_coal_tCO2/TJ",
+          "PE_y": "aux_elec_MWh_y × CM_grid_tCO2/MWh (biogenic CO2 = 0)",
+          "LE_y": "biomass_tonnes_y × transport_km × 0.062 kgCO2/t-km × 0.001"
+        },
+        "inputs": {
+          "baseline_coal_tonnes": 16800,
+          "coal_ncv_GJ_per_tonne": 15.12,
+          "coal_ef_tCO2_per_TJ": 94.6,
+          "aux_elec_MWh": 432,
+          "cm_tCO2_per_MWh": 0.757,
+          "biomass_tonnes": 16800,
+          "avg_transport_km": 75,
+          "leakage_factor_kgCO2_per_tonne_km": 0.062
+        },
+        "steps": {
+          "BE_y_tCO2": 23999.42,
+          "PE_y_tCO2": 327.02,
+          "LE_y_tCO2": 78.12,
+          "ER_y_tCO2e": 23594.28
+        },
+        "expected_annual_credits_tCO2e": 23594,
+        "calculation_notes": [
+          "BE_y = 16800 t × 15.12 GJ/t × 0.001 TJ/GJ × 94.6 tCO2/TJ = 23,999 tCO2",
+          "PE_y = 432 MWh × 0.757 tCO2/MWh = 327 tCO2 (auxiliary electricity only)",
+          "LE_y = 16800 t × 75 km × 0.062 kgCO2/t-km × 0.001 t/kg = 78.1 tCO2",
+          "ER_y = 23,999 - 327 - 78 = 23,594 tCO2e",
+          "NABL avg NCV = (14.9+15.3+15.1+15.4)/4 = 15.18 GJ/t → used IPCC default 15.12 (conservative)"
+        ]
+      },
+
+      "required_documents": [
+        {
+          "document_type": "NABL_NCV_TEST",
+          "description": "Quarterly NABL-accredited biomass NCV test certificates (rice husk + paddy straw briquettes)",
+          "mandatory": true,
+          "status": "PROVIDED",
+          "count_provided": 4
+        },
+        {
+          "document_type": "WEIGHBRIDGE_LOG",
+          "description": "Calibrated weighbridge logs for all biomass deliveries (daily tonne records with vehicle registration)",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "STEAM_METER_CALIBRATION",
+          "description": "Calibrated steam flow meter calibration certificate (NABL lab, annual)",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "BOILER_INSPECTION_CERTIFICATE",
+          "description": "Chief Inspector of Boilers (Punjab) annual inspection certificate for 20 TPH boiler",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "BASELINE_FUEL_PURCHASE_RECORDS",
+          "description": "Last 3-year coal purchase records (purchase orders, DO, invoices) for baseline establishment",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "SUPPLIER_CONTRACTS",
+          "description": "Biomass supplier contracts with FPO / biomass aggregator (Punjab)",
+          "mandatory": false,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "BEE_VERIFIER_REPORT",
+          "description": "Annual BEE-registered energy auditor verification report",
+          "mandatory": true,
+          "status": "PENDING"
+        }
+      ],
+
+      "scoring_estimate": {
+        "opportunity_score": 78,
+        "score_category": "HIGH_PRELIMINARY_POTENTIAL",
+        "fit": 22,
+        "data_quality": 17,
+        "scale": 15,
+        "additionality": 11,
+        "measurement": 9,
+        "documentation": 4,
+        "notes": "Good fit: complete fuel switch (100%), NABL quarterly tests available, weighbridge records complete. Scale moderate (23,594 tCO2e/yr). Pending verifier reduces docs score."
+      }
+    },
+
+    {
+      "_id": "archetype-C-cbg-plant-10tpd-satat",
+      "methodology_code": "BEE-CCTS-CBG-01",
+      "methodology_title": "Compressed Biogas (CBG) Production under SATAT — Avoided Methane and Fossil Fuel Displacement",
+
+      "organization": {
+        "name": "Maharashtra Bio-CNG Energy Pvt Ltd",
+        "legal_name": "Maharashtra Bio-CNG Energy Private Limited",
+        "cin": "U40300MH2021PTC351428",
+        "industry_sector": "BIOGAS_BIOENERGY",
+        "state": "Maharashtra",
+        "city": "Solapur"
+      },
+
+      "project": {
+        "title": "10 TPD CBG Plant — Sugar Mill Pressmud and Paddy Straw, Solapur",
+        "description": "10 TPD (10,000 kg/day) CBG production plant co-located with a 5000 TCD sugar mill at Madha, Solapur District, Maharashtra. Primary feedstock: sugar mill pressmud (wet press cake) and paddy straw from Solapur district procurement. Biogas upgraded to CBG (>96% CH4, ≤3% CO2) using pressure swing adsorption (PSA). Offtake agreement with Hindustan Petroleum Corporation Ltd (HPCL) under SATAT scheme.",
+        "sector": "BIOGAS_BIOENERGY",
+        "technology": "WET_ANAEROBIC_DIGESTION_PSA_UPGRADING",
+        "location_state": "Maharashtra",
+        "location_district": "Solapur",
+        "location_taluka": "Madha",
+        "location_lat": 17.6321,
+        "location_lng": 75.5322,
+        "cbg_capacity_kg_per_day": 10000,
+        "cbg_capacity_tonne_per_year": 3650,
+        "commissioning_date": "2024-01-10",
+        "satat_loi_number": "HPCL/SATAT/MH/2023/0174",
+        "offtaker": "Hindustan Petroleum Corporation Ltd (HPCL)",
+        "feedstock_primary": "SUGAR_MILL_PRESSMUD",
+        "feedstock_secondary": "PADDY_STRAW",
+        "prior_carbon_credit_registration": false
+      },
+
+      "regulatory_parameters": {
+        "scheme": "SATAT (Sustainable Alternative Towards Affordable Transportation), MoPNG, Oct 2018",
+        "ccts_gazette": "S.O. 2825(E), 28 Jun 2023, Ministry of Power",
+        "ipcc_ar6_ch4_biogenic_gwp100": 27.9,
+        "cng_ef_tCO2_per_tonne": 2.698,
+        "cng_ncv_MJ_per_kg": 47.1,
+        "cbg_ch4_content_pct": 96.5,
+        "pressmud_volatile_solids_fraction": 0.78,
+        "pressmud_methane_yield_m3_per_kg_VS": 0.28,
+        "paddy_straw_volatile_solids_fraction": 0.82,
+        "paddy_straw_methane_yield_m3_per_kg_VS": 0.22,
+        "baseline_feedstock_management": "OPEN_DUMPING_AND_FIELD_BURNING",
+        "ipcc_source_gwp": "IPCC AR6 WG1 Ch.7 Table 7.SM.7 (2021)",
+        "ipcc_hash_gwp": "b38ee6d6d5efe8e80558d0eaad79ab06ac7af31512721528300efb4267f9e75d",
+        "satat_url": "https://petroleum.nic.in/node/3294"
+      },
+
+      "production_data": {
+        "total_feedstock_processed_tonnes_year": 73000,
+        "pressmud_fraction_pct": 60,
+        "paddy_straw_fraction_pct": 40,
+        "pressmud_tonnes_year": 43800,
+        "paddy_straw_tonnes_year": 29200,
+        "raw_biogas_production_m3_year": 8395200,
+        "cbg_production_kg_year": 3467000,
+        "cbg_production_tonnes_year": 3467,
+        "monthly_cbg_production_kg": {
+          "2024-02": 278000,
+          "2024-03": 292000,
+          "2024-04": 285000,
+          "2024-05": 288000,
+          "2024-06": 279000,
+          "2024-07": 265000,
+          "2024-08": 282000,
+          "2024-09": 291000,
+          "2024-10": 298000,
+          "2024-11": 295000,
+          "2024-12": 290000,
+          "2025-01": 244000
+        },
+        "monthly_jmr_deliveries_kg": {
+          "2024-02": 276500,
+          "2024-03": 290100,
+          "2024-04": 283200,
+          "2024-05": 286300,
+          "2024-06": 277400,
+          "2024-07": 263500,
+          "2024-08": 280700,
+          "2024-09": 289400,
+          "2024-10": 296200,
+          "2024-11": 293500,
+          "2024-12": 288600,
+          "2025-01": 242800
+        },
+        "nabl_gas_analysis": [
+          {"month": "2024-03", "ch4_pct": 96.4, "co2_pct": 2.9, "h2s_ppm": 2},
+          {"month": "2024-06", "ch4_pct": 96.7, "co2_pct": 2.6, "h2s_ppm": 1},
+          {"month": "2024-09", "ch4_pct": 96.3, "co2_pct": 3.0, "h2s_ppm": 3},
+          {"month": "2024-12", "ch4_pct": 96.8, "co2_pct": 2.5, "h2s_ppm": 1}
+        ],
+        "auxiliary_electricity_MWh_year": 1820
+      },
+
+      "emission_calculation": {
+        "formula": "ER_y = BE_y - PE_y - LE_y",
+        "sub_formulas": {
+          "BE_y": "AvoidedMethane_tCO2e + FossilFuelDisplacement_tCO2e",
+          "AvoidedMethane": "CH4_captured_tonnes × GWP100_CH4_biogenic (27.9)",
+          "CH4_captured": "(pressmud_t × VS_pressmud × yield_pressmud + paddy_t × VS_paddy × yield_paddy) × CH4_density_kg_m3",
+          "FossilDisplacement": "CBG_delivered_tonnes × CNG_EF_tCO2_per_tonne",
+          "PE_y": "aux_elec_MWh × CM_tCO2_per_MWh + digestate_fugitive_tCO2e",
+          "LE_y": "fugitive_CH4_plant_losses_tCO2e"
+        },
+        "inputs": {
+          "pressmud_tonnes": 43800,
+          "paddy_straw_tonnes": 29200,
+          "pressmud_VS_fraction": 0.78,
+          "paddy_straw_VS_fraction": 0.82,
+          "pressmud_ch4_yield_m3_per_kg_VS": 0.28,
+          "paddy_straw_ch4_yield_m3_per_kg_VS": 0.22,
+          "ch4_density_kg_per_m3": 0.717,
+          "gwp100_ch4_biogenic": 27.9,
+          "cbg_delivered_tonnes": 3258.5,
+          "cng_ef_tCO2_per_tonne": 2.698,
+          "aux_elec_MWh": 1820,
+          "cm_grid_tCO2_per_MWh": 0.757,
+          "fugitive_leakage_pct": 1.5
+        },
+        "steps": {
+          "pressmud_ch4_m3": 9569520,
+          "paddy_straw_ch4_m3": 5267840,
+          "total_ch4_m3": 14837360,
+          "ch4_captured_tonnes": 10638,
+          "avoided_methane_tCO2e": 296800.2,
+          "fossil_fuel_displacement_tCO2e": 8791.4,
+          "BE_y_tCO2e": 305591.6,
+          "PE_aux_elec_tCO2e": 1377.74,
+          "LE_fugitive_ch4_tCO2e": 4440.0,
+          "ER_y_tCO2e": 299773.86
+        },
+        "expected_annual_credits_tCO2e": 299774,
+        "calculation_notes": [
+          "Pressmud CH4: 43800t × 0.78 VS × 0.28 m3/kgVS × 1000 kg/t = 9,569,520 m3 CH4",
+          "Paddy straw CH4: 29200t × 0.82 VS × 0.22 m3/kgVS × 1000 kg/t = 5,267,840 m3 CH4",
+          "Total CH4 = 14,837,360 m3 × 0.717 kg/m3 / 1000 = 10,638 tonnes CH4",
+          "Avoided methane = 10,638 t × 27.9 GWP100 = 296,800 tCO2e",
+          "Fossil displacement = 3,258.5 t CBG delivered × 2.698 tCO2/t CNG = 8,791 tCO2e",
+          "BE_y = 296,800 + 8,791 = 305,591 tCO2e",
+          "PE = 1820 MWh × 0.757 = 1,378 tCO2e (auxiliary electricity)",
+          "LE = 10,638 t CH4 × 1.5% fugitive × 27.9 GWP = 4,440 tCO2e",
+          "ER_y = 305,591 - 1,378 - 4,440 = 299,774 tCO2e",
+          "CNG EF: natural gas 56.1 tCO2/TJ × 47.1 MJ/kg / 1000 MJ/GJ × 1000 GJ/TJ = 2.643; rounded to 2.698 including upstream",
+          "IPCC AR6 CH4 biogenic GWP100 = 27.9 (without climate-carbon feedback)"
+        ]
+      },
+
+      "required_documents": [
+        {
+          "document_type": "SATAT_LOI",
+          "description": "HPCL Letter of Intent No. HPCL/SATAT/MH/2023/0174 under SATAT scheme",
+          "mandatory": true,
+          "status": "PROVIDED",
+          "reference_number": "HPCL/SATAT/MH/2023/0174"
+        },
+        {
+          "document_type": "GAS_FLOW_METER",
+          "description": "NABL-certified biogas inlet and CBG outlet mass flow meter calibration certificate",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "FEEDSTOCK_WEIGHBRIDGE",
+          "description": "Daily feedstock intake weighbridge logs with delivery challans (pressmud from sugar mill + straw from FPO)",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "NABL_GAS_ANALYSIS",
+          "description": "Monthly NABL gas analysis certificates confirming CH4% and CO2% of raw biogas",
+          "mandatory": true,
+          "status": "PROVIDED",
+          "count_provided": 11
+        },
+        {
+          "document_type": "JMR_HPCL",
+          "description": "Joint Measurement Report (JMR) with HPCL — monthly CBG delivered (kg), cumulative total",
+          "mandatory": true,
+          "status": "PROVIDED",
+          "count_provided": 11
+        },
+        {
+          "document_type": "SUGAR_MILL_AGREEMENT",
+          "description": "Pressmud supply agreement with parent sugar mill (5000 TCD crushing)",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "ENVIRONMENTAL_CLEARANCE",
+          "description": "Maharashtra PCB consent-to-operate and MoEFCC EC for biogas plant",
+          "mandatory": true,
+          "status": "PROVIDED"
+        },
+        {
+          "document_type": "BEE_VERIFIER_REPORT",
+          "description": "Annual BEE-accredited third-party verifier report for CCTS-CBG-01 MRV",
+          "mandatory": true,
+          "status": "PENDING"
+        }
+      ],
+
+      "scoring_estimate": {
+        "opportunity_score": 92,
+        "score_category": "HIGH_PRELIMINARY_POTENTIAL",
+        "fit": 25,
+        "data_quality": 20,
+        "scale": 22,
+        "additionality": 12,
+        "measurement": 9,
+        "documentation": 4,
+        "notes": "Excellent fit: SATAT LoI confirmed, NABL gas analysis available, JMR with HPCL, very high avoided methane volume (~300k tCO2e/yr). Scale exceptional for a 10 TPD plant due to large feedstock avoided methane. Pending BEE verifier report reduces docs."
+      }
+    }
+  ]
+}

@@ -8,11 +8,16 @@ import { db } from '@/lib/db';
 import { logAuditEvent } from '@/lib/audit';
 import { Fact, ResearchSource } from '@/lib/db/schema';
 import { isValidUUID, generateUUID } from '@/lib/utils';
+import { getAIProvider, AIProviderName } from '@/services/ai';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { companyName, website, sector, state, projectId, orgId } = body;
+
+    // BYOK: optional per-request provider and API key from client headers
+    const customProvider = (req.headers.get('x-llm-provider') || body.provider) as AIProviderName | undefined;
+    const customApiKey = req.headers.get('x-custom-api-key') || body.apiKey || undefined;
 
     if (!companyName || !state) {
       return NextResponse.json(
